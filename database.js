@@ -6,9 +6,12 @@ let pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'db_emeeting'
+    database: 'db_emeeting',
+    dateStrings: [
+        'DATE',
+        'DATETIME'
+    ]
 });
-
 pool.getConnection((err, connection) => {
     if (err) {
         if (err.code === 'PROTOCOL_CONNECTION_LOST') {

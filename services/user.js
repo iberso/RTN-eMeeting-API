@@ -14,6 +14,18 @@ async function get_user(nik) {
         return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
     }
 }
+async function get_all_users() {
+    try {
+        data = await pool.query('SELECT NIK,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user')
+        if (data.length != 0) {
+            return helper.http_response(data, 'Success', null);
+        } else {
+            return helper.http_response(null, 'Error', 'Data User is empty', 404)
+        }
+    } catch (err) {
+        return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+    }
+}
 
 function get_all_user_roles() {
     return new Promise((resolve, reject) => {
@@ -66,4 +78,4 @@ function get_user_role_by_id(id_role) {
 }
 
 
-module.exports = { get_all_user_roles, get_user_role_by_id, get_user };
+module.exports = { get_all_user_roles, get_user_role_by_id, get_user, get_all_users };

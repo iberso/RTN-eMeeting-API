@@ -9,8 +9,6 @@ app.listen(port, () => {
     console.log(`listening at http://localhost:${port}`)
 });
 
-
-//REQUEST GET user role
 app.get('/api/role/:id_role?', (req, res) => {
     if (req.params.id_role) {
         let data = user.get_user_role_by_id(req.params.id_role);
@@ -27,7 +25,13 @@ app.get('/api/role/:id_role?', (req, res) => {
     }
 });
 
-app.get('/api/test/:nik', async(req, res) => {
-    let response = await user.get_user(req.params.nik);
-    res.status(response.status_code).send(response.body);
+app.get('/api/user/:nik?', async(req, res) => {
+    let nik = req.params.nik;
+    if (nik) {
+        let response = await user.get_user(req.params.nik);
+        res.status(response.status_code).send(response.body);
+    } else {
+        let response = await user.get_all_users();
+        res.status(response.status_code).send(response.body);
+    }
 })
