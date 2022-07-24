@@ -172,3 +172,59 @@
     "message": "NIK does not exist"
 }
 ```
+
+## Request: Checking user role by id
+![GET](https://badgen.net/badge/Method/GET/green)<span style="margin-left:12px; font-size:12pt;">**/api/role/`<int:id_role>`**</span>
+
+### Responses:
+#### Request: Checking user role by id
+![OK](https://badgen.net/badge/OK/200/green)
+```json
+{
+    "status": "success",
+    "data": {
+        "id" : 1,
+        "role": "Admin"
+    }
+}
+```
+
+#### Request: Checking user role by id (not found)
+![Not Found](https://badgen.net/badge/Not%20Found/404/red)
+```json
+{
+    "status": "error",
+    "message": "Role not found"
+}
+```
+## Request: Get all user roles
+![GET](https://badgen.net/badge/Method/GET/green)<span style="margin-left:12px; font-size:12pt;">**/api/role**</span>
+
+### Responses:
+#### Request: Get all user roles
+![OK](https://badgen.net/badge/OK/200/green)
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "id" : 1,
+            "role": "Admin",
+        },
+        {
+            "id" : 2,
+            "role": "User",
+        }
+    ]
+    
+}
+```
+
+#### Request: Get all user roles (Data Empty)
+![Not Found](https://badgen.net/badge/Not%20Found/404/red)
+```json
+{
+    "status": "error",
+    "message": "Data Role is empty"
+}
+```
