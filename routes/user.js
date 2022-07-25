@@ -47,11 +47,12 @@ async function add_user(user) {
     ];
     try {
         data = await pool.query(sql, value);
-        if (data.length != 0) {
-            return helper.http_response(data, 'Success', null);
-        } else {
-            return helper.http_response(null, 'Error', 'Data User is empty', 404)
-        }
+        console.log(data)
+            // if (data.length != 0) {
+            //     return helper.http_response(data, 'Success', null);
+            // } else {
+            //     return helper.http_response(null, 'Error', 'Data User is empty', 404)
+            // }
     } catch (err) {
         return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
     }
