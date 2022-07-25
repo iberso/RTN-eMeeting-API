@@ -1,4 +1,7 @@
-let util = require('util')
+let util = require('util');
+const bcrypt = require("bcrypt");
+const { resolve } = require('path');
+const { rejects } = require('assert');
 
 function http_response(data = null, status = null, message = null, status_code = 200) {
     let body = {};
@@ -15,6 +18,19 @@ function http_response(data = null, status = null, message = null, status_code =
     return { status_code, body };
 }
 
+function hash_password(plain_text) {
+    return new Promise((resolve, rejects) => {
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(plain_text, salt, function(err, hash) {
+                if (err) {
+                    return rejects(err);
+                }
+                return resolve(hash);
+            });
+        });
+    });
+}
 module.exports = {
-    http_response
+    http_response,
+    hash_password
 }

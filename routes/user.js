@@ -4,7 +4,6 @@ let util = require('util');
 const uuid = require('uuid');
 const bcrypt = require("bcrypt");
 
-
 async function get_user(nik) {
     try {
         data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user WHERE nik = ?', [nik])
@@ -30,29 +29,23 @@ async function get_all_users() {
         return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
     }
 }
-
-// INSERT INTO `user` (`nik`, `username`, `email_address`, `id_role`, `password`, `device_token`, `phone_number`, `gender`, `date_of_birth`) VALUES ('123458', 'Iverson', 'iverson@gmail.com', '2', NULL, NULL, '6281248633737', 'Male', '1999-01-01');
+//TODO : make await to bcrpyt
 async function add_user(user) {
-
-    let hashed_password = await bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(user.date_of_birth, salt, function(err, hash) {
-            console.log(hash)
-            return hash;
-        });
-    });
+    const hash_password = await bcrypt.hash(user.date_of_birth, 10);
+    console.log(hash_password)
     let sql = 'INSERT INTO user (nik,username,email_address,id_role,password,device_token,phone_number,gender,date_of_birth) VALUES (?,?,?,?,?,?,?,?,?)';
     let value = [
         user.nik,
         user.username,
         user.email_address,
         user.id_role,
-        hashed_password,
+        hash_password,
         user.device_token,
         user.phone_number,
         user.gender,
         user.date_of_birth
     ];
-    console.log(value)
+    console.log("hai")
     try {
         data = await pool.query(sql, value);
         return helper.http_response(data, 'Success', null);
