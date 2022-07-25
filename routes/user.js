@@ -68,10 +68,10 @@ async function add_user(user) {
     }
 }
 
-async function edit_user(user) {
-    let api_response = await get_user(user.nik);
-    if (api_response.status_code === 200) {
-        return helper.http_response(null, 'Error', 'User already exist', 404)
+async function edit_user(user, nik) {
+    let api_response = await get_user(nik);
+    if (api_response.status_code === 404) {
+        return helper.http_response(null, 'Error', 'User not found', 404)
     }
 
     let sql = 'UPDATE user SET username = ?, email_address = ?, id_role = ?, device_token = ?, phone_number = ?, gender = ?, date_of_birth = ? WHERE nik = ?';
@@ -84,12 +84,12 @@ async function edit_user(user) {
         user.phone_number,
         user.gender,
         user.date_of_birth,
-        user.nik
+        nik
     ];
     try {
         await pool.query(sql, value);
         data = {
-            'nik': user.nik,
+            'nik': nik,
             'username': user.username,
             'email_address': user.email_address,
             'id_role': user.id_role,

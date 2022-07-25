@@ -30,7 +30,7 @@ app.post('/api/user', async(req, res) => {
 })
 
 app.put('/api/user/:nik', async(req, res) => {
-    let response = await user.edit_user(req.body);
+    let response = await user.edit_user(req.body, req.params.nik);
     res.status(response.status_code).send(response.body);
 })
 
