@@ -1,4 +1,5 @@
 # User
+
 ## Request: Checking the availability of user account
 ![GET](https://badgen.net/badge/Method/GET/green)<span style="margin-left:12px; font-size:12pt;">**/api/user/`<int:nik>`**</span>
 
@@ -172,6 +173,8 @@
     "message": "NIK does not exist"
 }
 ```
+
+# Role
 
 ## Request: Checking user role by id
 ![GET](https://badgen.net/badge/Method/GET/green)<span style="margin-left:12px; font-size:12pt;">**/api/role/`<int:id_role>`**</span>
