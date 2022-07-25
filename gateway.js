@@ -1,4 +1,5 @@
-const user = require('./services/user');
+const user = require('./routes/user');
+const role = require('./routes/role');
 const express = require('express');
 const { json } = require("express");
 const app = express();
@@ -9,25 +10,8 @@ app.listen(port, () => {
     console.log(`listening at http://localhost:${port}`)
 });
 
-app.get('/api/role/:id_role?', (req, res) => {
-    if (req.params.id_role) {
-        let data = user.get_user_role_by_id(req.params.id_role);
-        data.then(function(response) {
-            res.status(response.status_code).send(response.body);
-        })
-    } else {
-        let data = user.get_all_user_roles();
-        data.then(function(response) {
-            res.status(response.status_code).send(response.body);
-        }).catch(function(error) {
-            res.status(error.status_code).send(error.body);
-        })
-    }
-});
-
 app.get('/api/user/:nik?', async(req, res) => {
-    let nik = req.params.nik;
-    if (nik) {
+    if (req.params.nik) {
         let response = await user.get_user(req.params.nik);
         res.status(response.status_code).send(response.body);
     } else {
@@ -35,3 +19,13 @@ app.get('/api/user/:nik?', async(req, res) => {
         res.status(response.status_code).send(response.body);
     }
 })
+
+app.get('/api/role/:id_role?', async(req, res) => {
+    if (req.params.id_role) {
+        let response = await role.get_user_role_by_id(req.params.id_role);
+        res.status(response.status_code).send(response.body);
+    } else {
+        let response = await role.get_all_user_roles();
+        res.status(response.status_code).send(response.body);
+    }
+});
