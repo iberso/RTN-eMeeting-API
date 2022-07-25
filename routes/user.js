@@ -29,7 +29,7 @@ async function get_all_users() {
         return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
     }
 }
-//TODO : make await to bcrpyt
+
 async function add_user(user) {
     let api_response = await get_user(user.nik);
     if (api_response.status_code === 200) {
@@ -68,7 +68,43 @@ async function add_user(user) {
     }
 }
 
+async function edit_user(user) {
+    let api_response = await get_user(user.nik);
+    if (api_response.status_code === 200) {
+        return helper.http_response(null, 'Error', 'User already exist', 404)
+    }
+
+    let sql = 'UPDATE user SET username = ?, email_address = ?, id_role = ?, device_token = ?, phone_number = ?, gender = ?, date_of_birth = ? WHERE nik = ?';
+
+    let value = [
+        user.username,
+        user.email_address,
+        user.id_role,
+        user.device_token,
+        user.phone_number,
+        user.gender,
+        user.date_of_birth,
+        user.nik
+    ];
+    try {
+        await pool.query(sql, value);
+        data = {
+            'nik': user.nik,
+            'username': user.username,
+            'email_address': user.email_address,
+            'id_role': user.id_role,
+            'device_token': user.device_token,
+            'phone_number': user.phone_number,
+            'gender': user.gender,
+            'date_of_birth': user.date_of_birth
+        }
+        return helper.http_response(data, 'Success', "Account updated successfully");
+    } catch (err) {
+        return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+    }
+
+}
 
 
 
-module.exports = { get_user, get_all_users, add_user };
+module.exports = { get_user, get_all_users, add_user, edit_user };

@@ -73,7 +73,7 @@
 ```json
 {
     "status": "error",
-    "message": "Account already registered"
+    "message": "User already exist"
 }
 ```
 
@@ -91,7 +91,6 @@
         "phone_number": "6281200000000",
         "gender": "Male",
         "date_of_birth": "1999-01-01"
-        
 }
 ```
 
@@ -103,7 +102,7 @@
     "status": "success",
     "message": "User updated successfully",
     "data": {
-         "nik": 123455,
+        "nik": 123455,
         "username": "Example",
         "email_address": "example@example.com",
         "id_role": 1,

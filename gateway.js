@@ -13,10 +13,6 @@ app.listen(port, () => {
 
 app.use(bodyParser.json());
 
-app.post('/api/user', async(req, res) => {
-    let response = await user.add_user(req.body);
-    res.status(response.status_code).send(response.body);
-})
 
 app.get('/api/user/:nik?', async(req, res) => {
     if (req.params.nik) {
@@ -26,6 +22,16 @@ app.get('/api/user/:nik?', async(req, res) => {
         let response = await user.get_all_users();
         res.status(response.status_code).send(response.body);
     }
+})
+
+app.post('/api/user', async(req, res) => {
+    let response = await user.add_user(req.body);
+    res.status(response.status_code).send(response.body);
+})
+
+app.put('/api/user/:nik', async(req, res) => {
+    let response = await user.edit_user(req.body);
+    res.status(response.status_code).send(response.body);
 })
 
 
