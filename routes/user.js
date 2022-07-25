@@ -31,7 +31,7 @@ async function get_all_users() {
 }
 //TODO : make await to bcrpyt
 async function add_user(user) {
-    const hash_password = await bcrypt.hash(user.date_of_birth, 10);
+    const hash_password = await bcrypt.hash(user.date_of_birth.split('-').join(""), 10);
     console.log(hash_password)
     let sql = 'INSERT INTO user (nik,username,email_address,id_role,password,device_token,phone_number,gender,date_of_birth) VALUES (?,?,?,?,?,?,?,?,?)';
     let value = [
@@ -45,10 +45,20 @@ async function add_user(user) {
         user.gender,
         user.date_of_birth
     ];
-    console.log("hai")
     try {
-        data = await pool.query(sql, value);
-        return helper.http_response(data, 'Success', null);
+        await pool.query(sql, value);
+        data = {
+            'nik': user.nik,
+            'username': user.username,
+            'email_address': user.email_address,
+            'id_role': user.id_role,
+            'password': user.date_of_birth.split('-').join(""),
+            'device_token': user.device_token,
+            'phone_number': user.phone_number,
+            'gender': user.gender,
+            'date_of_birth': user.date_of_birth
+        }
+        return helper.http_response(data, 'Success', "Account created successfully");
     } catch (err) {
         return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
     }
