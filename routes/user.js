@@ -3,7 +3,6 @@ const pool = require('../database');
 let util = require('util');
 const uuid = require('uuid');
 const bcrypt = require("bcrypt");
-
 async function get_user(nik) {
     try {
         data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user WHERE nik = ?', [nik])
@@ -31,8 +30,12 @@ async function get_all_users() {
 }
 //TODO : make await to bcrpyt
 async function add_user(user) {
+    let api_response = await get_user(user.nik);
+    if (api_response.status_code === 200) {
+        return helper.http_response(null, 'Error', 'User already exist', 404)
+    }
     const hash_password = await bcrypt.hash(user.date_of_birth.split('-').join(""), 10);
-    console.log(hash_password)
+
     let sql = 'INSERT INTO user (nik,username,email_address,id_role,password,device_token,phone_number,gender,date_of_birth) VALUES (?,?,?,?,?,?,?,?,?)';
     let value = [
         user.nik,

@@ -36,14 +36,14 @@
 
 ```json
 {
-    "nik": 1234556,
-    "username": "John Doe",
+    "nik": 123455,
+    "username": "Example",
+    "email_address": "example@example.com",
     "id_role": 1,
-    "email_address": "johndoe@example.com",
+    "device_token": "84bbb6d8-0bd6-11ed-8854-4205ac4d772c",
     "phone_number": "6281200000000",
-    "gender": "male",
+    "gender": "Male",
     "date_of_birth": "1999-01-01"
-
 }
 ```
 
@@ -55,12 +55,14 @@
     "status": "success",
     "message": "Account created successfully",
     "data": {
-        "nik": 1234556,
-        "username": "John Doe",
+        "nik": 123455,
+        "username": "Example",
+        "email_address": "example@example.com",
         "id_role": 1,
-        "email_address": "johndoe@example.com",
+        "password": "19990101",
+        "device_token": "84bbb6d8-0bd6-11ed-8854-4205ac4d772c",
         "phone_number": "6281200000000",
-        "gender": "male",
+        "gender": "Male",
         "date_of_birth": "1999-01-01"
     }
 }
