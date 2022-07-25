@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+let util = require('util')
 
 function http_response(data = null, status = null, message = null, status_code = 200) {
     let body = {};
@@ -15,14 +15,6 @@ function http_response(data = null, status = null, message = null, status_code =
     return { status_code, body };
 }
 
-function hash_password(plain_text) {
-    bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(plain_text, salt, function(err, hash) {
-            return hash;
-        });
-    })
-}
 module.exports = {
-    http_response,
-    hash_password
+    http_response
 }

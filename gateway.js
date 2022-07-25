@@ -11,13 +11,11 @@ app.listen(port, () => {
     console.log(`listening at http://localhost:${port}`)
 });
 
-let jsonParser = bodyParser.json();
+app.use(bodyParser.json());
 
-app.post('/api/user', jsonParser, async(req, res) => {
-    console.log(req.body);
-    res.send(req.body);
-    // let response = await user.add_user();
-    // console.log(response);
+app.post('/api/user', async(req, res) => {
+    let response = await user.add_user(req.body);
+    res.status(response.status_code).send(response.body);
 })
 
 app.get('/api/user/:nik?', async(req, res) => {
