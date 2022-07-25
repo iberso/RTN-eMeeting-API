@@ -33,8 +33,20 @@ async function get_all_users() {
 // INSERT INTO `user` (`nik`, `username`, `email_address`, `id_role`, `password`, `device_token`, `phone_number`, `gender`, `date_of_birth`) VALUES ('123458', 'Iverson', 'iverson@gmail.com', '2', NULL, NULL, '6281248633737', 'Male', '1999-01-01');
 async function add_user(user) {
     let hashed_password = await helper.hash_password(user.date_of_birth);
+    let sql = 'INSERT INTO user (nik,username,email_address,id_role,password,device_token,phone_number,gender,date_of_birth) VALUES ?';
+    let value = [
+        user.nik,
+        user.username,
+        user.email_address,
+        user.id_role,
+        hashed_password,
+        user.device_token,
+        user.phone_number,
+        user.gender,
+        user.date_of_birth
+    ];
     try {
-        data = await pool.query('INSERT INTO user');
+        data = await pool.query(sql, value);
         if (data.length != 0) {
             return helper.http_response(data, 'Success', null);
         } else {
