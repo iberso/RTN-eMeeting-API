@@ -8,17 +8,18 @@
 ![OK](https://badgen.net/badge/OK/200/green)
 ```json
 {
-    "status": "success",
-    "data": {
-        "nik": 1,
-        "username": "John Doe",
-        "email_address": "johnDoe@example.com",
-        "id_role": 1,
-        "device_token": "ux8s9f-sad9x-asdasw",
-        "phone_number": "6281200000000",
-        "gender": "male",
-        "date_of_birth": "1999-01-01"
-    }
+    "status": "Success",
+    "data":
+        {
+            "nik": 123456,
+            "username": "Example",
+            "email_address": "example@example.com",
+            "id_role": 1,
+            "device_token": "84bbb6d8-0bd6-11ed-8854-4205ac4d772c",
+            "phone_number": "6281200000000",
+            "gender": "Male",
+            "date_of_birth": "1999-01-01"
+        }
 }
 ```
 
@@ -26,7 +27,7 @@
 ![Not Found](https://badgen.net/badge/Not%20Found/404/red)
 ```json
 {
-    "status": "error",
+    "status": "Error",
     "message": "User not found"
 }
 ```
@@ -82,13 +83,15 @@
 
 ```json
 {
-        "username": "John Doe",
+        "username": "Example",
+        "email_address": "example@example.com",
         "id_role": 1,
-        "email_address": "johndoe@example.com",
+        "password": "19990101",
+        "device_token": "84bbb6d8-0bd6-11ed-8854-4205ac4d772c",
         "phone_number": "6281200000000",
-        "gender": "male",
-        "date_of_birth": "1999-01-01",
-        "password": "johndoe123456"
+        "gender": "Male",
+        "date_of_birth": "1999-01-01"
+        
 }
 ```
 
@@ -100,13 +103,14 @@
     "status": "success",
     "message": "User updated successfully",
     "data": {
-        "nik": 1234556,
-        "username": "John Doe",
+         "nik": 123455,
+        "username": "Example",
+        "email_address": "example@example.com",
         "id_role": 1,
-        "email_address": "johndoe@example.com",
+        "device_token": "84bbb6d8-0bd6-11ed-8854-4205ac4d772c",
         "phone_number": "6281200000000",
-        "gender": "male",
-        "date_of_birth": "1999-01-01",
+        "gender": "Male",
+        "date_of_birth": "1999-01-01"
     }
 }
 ```
@@ -172,7 +176,7 @@
 ```json
 {
     "status": "error",
-    "message": "NIK does not exist"
+    "message": "User does not exist"
 }
 ```
 

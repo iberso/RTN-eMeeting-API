@@ -8,7 +8,7 @@ async function get_user(nik) {
     try {
         data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user WHERE nik = ?', [nik])
         if (data.length != 0) {
-            return helper.http_response(data, 'Success', null);
+            return helper.http_response(data[0], 'Success', null);
         } else {
             return helper.http_response(null, 'Error', 'User not found', 404)
         }
