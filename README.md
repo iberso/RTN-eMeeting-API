@@ -37,7 +37,7 @@
 ```json
 {
     "nik": 1234556,
-    "name": "John Doe",
+    "username": "John Doe",
     "id_role": 1,
     "email_address": "johndoe@example.com",
     "phone_number": "6281200000000",
@@ -56,7 +56,7 @@
     "message": "Account created successfully",
     "data": {
         "nik": 1234556,
-        "name": "John Doe",
+        "username": "John Doe",
         "id_role": 1,
         "email_address": "johndoe@example.com",
         "phone_number": "6281200000000",
@@ -80,7 +80,7 @@
 
 ```json
 {
-        "name": "John Doe",
+        "username": "John Doe",
         "id_role": 1,
         "email_address": "johndoe@example.com",
         "phone_number": "6281200000000",
@@ -99,7 +99,7 @@
     "message": "User updated successfully",
     "data": {
         "nik": 1234556,
-        "name": "John Doe",
+        "username": "John Doe",
         "id_role": 1,
         "email_address": "johndoe@example.com",
         "phone_number": "6281200000000",

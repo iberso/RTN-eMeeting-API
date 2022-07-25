@@ -1,6 +1,8 @@
 const helper = require('../helper');
 const pool = require('../database');
-let util = require('util')
+let util = require('util');
+const uuid = require('uuid');
+
 
 async function get_user(nik) {
     try {
@@ -18,6 +20,21 @@ async function get_user(nik) {
 async function get_all_users() {
     try {
         data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user')
+        if (data.length != 0) {
+            return helper.http_response(data, 'Success', null);
+        } else {
+            return helper.http_response(null, 'Error', 'Data User is empty', 404)
+        }
+    } catch (err) {
+        return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+    }
+}
+
+// INSERT INTO `user` (`nik`, `username`, `email_address`, `id_role`, `password`, `device_token`, `phone_number`, `gender`, `date_of_birth`) VALUES ('123458', 'Iverson', 'iverson@gmail.com', '2', NULL, NULL, '6281248633737', 'Male', '1999-01-01');
+async function add_user(user) {
+    let hashed_password = await helper.hash_password(user.date_of_birth);
+    try {
+        data = await pool.query('INSERT INTO user');
         if (data.length != 0) {
             return helper.http_response(data, 'Success', null);
         } else {
