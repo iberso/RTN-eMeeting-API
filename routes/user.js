@@ -3,6 +3,7 @@ const pool = require('../database');
 let util = require('util');
 const uuid = require('uuid');
 const bcrypt = require("bcrypt");
+
 async function get_user(nik) {
     try {
         data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user WHERE nik = ?', [nik])
@@ -61,7 +62,7 @@ async function add_user(user) {
             'gender': user.gender,
             'date_of_birth': user.date_of_birth
         }
-        return helper.http_response(data, 'Success', "Account created successfully");
+        return helper.http_response(data, 'Success', "Account created successfully", 201);
     } catch (err) {
         return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
     }
