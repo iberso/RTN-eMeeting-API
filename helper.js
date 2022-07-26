@@ -5,6 +5,7 @@ const { rejects } = require('assert');
 
 const fs = require('fs');
 
+let test;
 module.exports = {
     http_response(data = null, status = null, message = null, status_code = 200, token = null) {
         let body = {};
@@ -40,6 +41,7 @@ module.exports = {
         let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
         let token_obj = { "value": client_token };
         list_token.tokens.push(token_obj)
+
         fs.writeFile('./files/token.json', JSON.stringify(list_token), (err) => {
             if (err) console.log('Error writing file:', err)
         })
@@ -54,16 +56,40 @@ module.exports = {
         })
     },
 
-    check_token(client_token) {
-        let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        console.log(list_token)
-        let flag = false
-        list_token.tokens.forEach(token => {
-            if (token.value === client_token) {
-                return flag = true;
-            }
-        });
-        return flag;
-    }
+    // check_token(client_token) {
+    //     let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+    //     console.log(list_token)
+    //     let flag = false
+    //     list_token.tokens.forEach(token => {
+    //         if (token.value === client_token) {
+    //             return flag = true;
+    //         }
+    //     });
+    //     return flag;
+    // },
 
+    check_header(req, res, next) {
+
+        function check_token(client_token) {
+            let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+            console.log(list_token)
+            let flag = false
+            list_token.tokens.forEach(token => {
+                if (token.value === client_token) {
+                    return flag = true;
+                }
+            });
+            return flag;
+        }
+
+        let header_authorization = req.header('authorization');
+        if (header_authorization) {
+            let token = header_authorization.split(" ")[1]
+            if (!check_token(token)) {
+                res.status(401).send({ "status": "Error", "message": "Unauthorized" });
+                return;
+            }
+        }
+        next();
+    }
 }

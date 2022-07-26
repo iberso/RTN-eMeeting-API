@@ -14,8 +14,7 @@ app.listen(port, () => {
 
 app.use(bodyParser.json());
 
-
-app.get('/api/user/:nik?', async(req, res) => {
+app.get('/api/user/:nik?', helper.check_header, async(req, res) => {
     if (req.params.nik) {
         let response = await user.get_user(req.params.nik);
         res.status(response.status_code).send(response.body);
@@ -55,6 +54,3 @@ app.get('/api/check-token', async(req, res) => {
     let response = await user.check_token(req.body.token);
     res.status(response.status_code).send(response.body);
 })
-
-// console.log(helper.check_token("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NTg4MjI3MjMsImRhdGEiOnsibmlrIjoxMjM0NTYsInVzZXJuYW1lIjoiRXhhbXBsZSIsImVtYWlsX2FkZHJlc3MiOiJleGFtcGxlQGV4YW1wbGUuY29tIiwiaWRfcm9sZSI6MSwiZGV2aWNlX3Rva2VuIjoiODRiYmI2ZDgtMGJkNi0xMWVkLTg4NTQtNDIwNWFjNGQ3NzJjIiwicGhvbmVfbnVtYmVyIjoiNjI4MTIwMDAwMDAwMCIsImdlbmRlciI6Ik1hbGUiLCJkYXRlX29mX2JpcnRoIjoiMTk5OS0wMS0wMSJ9LCJpYXQiOjE2NTg4MTkxMjN9.TIYdS0gad5KbohAsaZb0iR0m0cc-mjomoFeXGNIHjdY"))
-helper.remove_token("asd")

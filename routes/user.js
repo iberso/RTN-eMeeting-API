@@ -34,7 +34,7 @@ module.exports = {
     },
 
     async login_user(user) {
-        let api_response = await get_user(user.nik);
+        let api_response = await this.get_user(user.nik);
         if (api_response.status_code != 200) {
             return helper.http_response(null, 'Error', 'User not found', 404)
         }
@@ -56,8 +56,8 @@ module.exports = {
 
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
-                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), data: res_data }, "disini_private_key", { algorithm: 'HS256' });
-
+                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 1), data: res_data }, "disini_private_key", { algorithm: 'HS256' });
+                helper.add_token(token)
                 return helper.http_response(null, 'Success', "Successfully logged in", 200, token);
             } else {
                 return helper.http_response(null, 'Unauthorized', "Invalid Credentials (Wrong Password)", 401)
@@ -144,11 +144,19 @@ module.exports = {
     },
 
     async check_token(token) {
-        let result = await jwt.verify(token, 'disini_private_key');
-        if (result) {
-            return helper.http_response(null, 'Success', 'token valid', 200)
-        } else {
-            return helper.http_response(null, 'Error', 'token invalid', 404)
+        try {
+            let result = await jwt.verify(token, 'disini_private_key');
+
+            if (result) {
+                return helper.http_response(null, 'Success', 'token valid', 200)
+            } else {
+                return helper.http_response(null, 'Error', 'token invalid', 404)
+            }
+        } catch (err) {
+            return helper.http_response(null, 'Error', err, 404)
         }
     }
 };
+
+
+// 15
