@@ -1,5 +1,6 @@
 const helper = require('../helper');
 const pool = require('../database');
+const jwt = require('jsonwebtoken');
 let util = require('util');
 const uuid = require('uuid');
 const bcrypt = require("bcrypt");
@@ -34,6 +35,34 @@ async function login_user(user) {
     let api_response = await get_user(user.nik);
     if (api_response.status_code != 200) {
         return helper.http_response(null, 'Error', 'User not found', 404)
+    }
+
+    let sql = 'SELECT * FROM user WHERE nik = ?'
+    let value = [user.nik]
+    try {
+        let data = await pool.query(sql, value);
+        let res_data = {
+            'nik': data[0].nik,
+            'username': data[0].username,
+            'email_address': data[0].email_address,
+            'id_role': data[0].id_role,
+            'device_token': data[0].device_token,
+            'phone_number': data[0].phone_number,
+            'gender': data[0].gender,
+            'date_of_birth': data[0].date_of_birth
+        }
+
+        let result = await bcrypt.compare(user.password, data[0].password);
+        if (result) {
+            const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), data: res_data }, "disini_private_key", { algorithm: 'HS256' });
+            console.log(token)
+            return helper.http_response(token, 'Success', "Successfully logged in", 200);
+        } else {
+            return helper.http_response(null, 'Unauthorized', "Invalid Credentials (Wrong Password)" + err.message, 401)
+
+        }
+    } catch (err) {
+        return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
     }
 }
 

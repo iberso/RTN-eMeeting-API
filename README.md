@@ -126,7 +126,6 @@
 ```json
 {
     "nik": 123456,
-    "email_address": "johndoe@example.com",
     "password": "johndoe123"
 }
 ```
@@ -145,8 +144,8 @@
 ![Unauthorized](https://badgen.net/badge/Unauthorized/401/red)
 ```json
 {
-    "status": "error",
-    "message": "invalid credentials (wrong email/nik/password)"
+    "status": "Unauthorized",
+    "message": "invalid credentials (wrong password)"
 }
 ```
 
