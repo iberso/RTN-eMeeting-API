@@ -12,6 +12,7 @@ let pool = mysql.createPool({
         'DATETIME'
     ]
 });
+
 pool.getConnection((err, connection) => {
     if (err) {
         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
