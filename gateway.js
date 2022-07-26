@@ -48,3 +48,9 @@ app.get('/api/role/:id_role?', async(req, res) => {
         res.status(response.status_code).send(response.body);
     }
 });
+
+
+app.get('/api/check-token', async(req, res) => {
+    let response = await user.check_token(req.body.token);
+    res.status(response.status_code).send(response.body);
+})

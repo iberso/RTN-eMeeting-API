@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const { resolve } = require('path');
 const { rejects } = require('assert');
 
-function http_response(data = null, status = null, message = null, status_code = 200) {
+function http_response(data = null, status = null, message = null, status_code = 200, token = null) {
     let body = {};
     body.status = status;
 
@@ -14,7 +14,9 @@ function http_response(data = null, status = null, message = null, status_code =
     if (data != null) {
         body.data = data;
     }
-
+    if (token != null) {
+        body.token = token;
+    }
     return { status_code, body };
 }
 
