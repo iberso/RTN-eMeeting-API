@@ -86,7 +86,6 @@
         "username": "Example",
         "email_address": "example@example.com",
         "id_role": 1,
-        "password": "19990101",
         "device_token": "84bbb6d8-0bd6-11ed-8854-4205ac4d772c",
         "phone_number": "6281200000000",
         "gender": "Male",
@@ -138,7 +137,8 @@
 ```json
 {
     "status": "success",
-    "message": "Successfully logged in"
+    "message": "Successfully logged in",
+    "token": "JWT TOKEN HERE"
 }
 ```
 #### Login User Account (Wrong Credentials)
@@ -146,7 +146,7 @@
 ```json
 {
     "status": "error",
-    "message": "Unauthorized: invalid credentials (wrong email/nik/password)"
+    "message": "invalid credentials (wrong email/nik/password)"
 }
 ```
 

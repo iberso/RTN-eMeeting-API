@@ -29,12 +29,15 @@ app.post('/api/user', async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
+app.post('/api/user/login', async(req, res) => {
+    let response = await user.login_user(req.body);
+    res.status(response.status_code).send(response.body);
+})
+
 app.put('/api/user/:nik', async(req, res) => {
     let response = await user.edit_user(req.body, req.params.nik);
     res.status(response.status_code).send(response.body);
 })
-
-
 
 app.get('/api/role/:id_role?', async(req, res) => {
     if (req.params.id_role) {

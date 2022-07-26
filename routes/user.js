@@ -30,6 +30,13 @@ async function get_all_users() {
     }
 }
 
+async function login_user(user) {
+    let api_response = await get_user(user.nik);
+    if (api_response.status_code != 200) {
+        return helper.http_response(null, 'Error', 'User not found', 404)
+    }
+}
+
 async function add_user(user) {
     let api_response = await get_user(user.nik);
     if (api_response.status_code === 200) {
@@ -107,4 +114,4 @@ async function edit_user(user, nik) {
 
 
 
-module.exports = { get_user, get_all_users, add_user, edit_user };
+module.exports = { get_user, get_all_users, add_user, edit_user, login_user };
