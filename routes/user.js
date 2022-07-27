@@ -117,7 +117,8 @@ module.exports = {
     },
 
     async edit_user(user, nik) {
-        let api_response = await get_user(nik);
+        console.log("erree")
+        let api_response = await this.get_user(nik);
         if (api_response.status_code === 404) {
             return helper.http_response(null, 'Error', 'User not found', 404)
         }
@@ -153,5 +154,28 @@ module.exports = {
 
     },
 
+    async change_password(req) {
+        let token = helper.get_token_from_headers(req);
+        let decoded_token = jwt.decode(token)
+        let user = req.body;
+        console.log(decoded_token)
+
+        let api_response = await this.get_user(decoded_token.data.nik);
+        if (api_response.status_code === 404) {
+            return helper.http_response(null, 'Error', 'User not found', 404)
+        }
+
+        let sql = 'UPDATE user SET password = ? WHERE nik = ?';
+        const hash_password = await bcrypt.hash(user.new_password, 10);
+
+        let value = [hash_password, decoded_token.data.nik];
+
+        try {
+            await pool.query(sql, value);
+            return helper.http_response(null, 'Success', "Password Changes successfully");
+        } catch (err) {
+            return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+        }
+    }
 
 };

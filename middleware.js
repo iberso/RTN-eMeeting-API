@@ -25,9 +25,10 @@ module.exports = {
             result.then(function(value) {
                 if (value.status_code != 401) {
                     next();
+                } else {
+                    res.status(value.status_code).send(value.body);
+                    return;
                 }
-                res.status(value.status_code).send(value.body);
-                return;
             });
         } else {
             res.status(401).send({ "status": "Error", "message": "User are not logged in" });

@@ -42,10 +42,16 @@ app.post('/api/user/logout', middleware.check_authorization, async(req, res) => 
     res.status(response.status_code).send(response.body);
 })
 
+app.put('/api/user/change-password', middleware.check_authorization, async(req, res) => {
+    let response = await user.change_password(req);
+    res.status(response.status_code).send(response.body);
+})
+
 app.put('/api/user/:nik', middleware.check_authorization, async(req, res) => {
     let response = await user.edit_user(req.body, req.params.nik);
     res.status(response.status_code).send(response.body);
 })
+
 
 app.get('/api/role/:id_role?', middleware.check_authorization, async(req, res) => {
     if (req.params.id_role) {
