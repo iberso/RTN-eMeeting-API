@@ -11,32 +11,19 @@ let PRIVATE_KEY = "halo-semua-nya";
 module.exports = {
     async verify_token(req) {
         let token = this.get_token_from_headers(req);
-
         try {
             let result = await jwt.verify(token, PRIVATE_KEY);
-            // console.log(result)
+            console.log(result)
             if (result) {
-                console.log(result.iat)
-                let time_issued = new Date(result.iat)
-                console.log("issued time: " + time_issued)
-
-                let time = new Date(result.exp)
-                console.log("exp time: " + time)
+                if (!this.check_token(token)) {
+                    return this.http_response(null, 'Error', 'invalid token', 401)
+                }
                 return this.http_response(null, 'Success', 'token valid', 200)
-
             } else {
-                return this.http_response(null, 'Error', 'token invalid', 404)
+                return this.http_response(null, 'Error', 'invalid token', 401)
             }
         } catch (err) {
-            let time = new Date(err.message.exp)
-            console.log("exp time: " + time.getHours() + ":" + time.getSeconds())
-            return this.http_response(null, 'Error', err.message, 404)
-                // if (this.check_token(token)) {
-                //     this.remove_token(token)
-                //     return this.http_response(null, 'Errorr', err, 404)
-                // } else {
-                //     return this.http_response(null, 'Error', 'token Expired', 404)
-                // }
+            return this.http_response(null, 'Error', 'token Expired', 404)
         }
     },
 
