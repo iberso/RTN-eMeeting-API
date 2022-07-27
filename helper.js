@@ -67,7 +67,7 @@ module.exports = {
 
     remove_token(client_token) {
         let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        remaining_token = list_token.tokens.filter(data => data != client_token);
+        let remaining_token = list_token.tokens.filter(data => data != client_token);
         fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
             if (err) console.log('Error writing file:', err)
         })

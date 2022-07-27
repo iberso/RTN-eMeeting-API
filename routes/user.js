@@ -56,7 +56,7 @@ module.exports = {
 
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
-                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 1), data: res_data }, PRIVATE_KEY, { algorithm: 'HS256' });
+                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), data: res_data }, PRIVATE_KEY, { algorithm: 'HS256' });
                 helper.add_token(token)
                 return helper.http_response(null, 'Success', "Successfully logged in", 200, token);
             } else {
@@ -69,7 +69,8 @@ module.exports = {
     },
 
 
-    async logout_user(token) {
+    async logout_user(req) {
+        let token = helper.get_token_from_headers(req);
         if (helper.check_token(token)) {
             helper.remove_token(token);
             return helper.http_response(null, 'Success', 'User logged out successfully')

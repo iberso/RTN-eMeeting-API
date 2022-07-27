@@ -32,12 +32,12 @@ app.post('/api/user', async(req, res) => {
 
 app.post('/api/user/login', async(req, res) => {
     let response = await user.login_user(req.body);
-    res.status(response.status_code).send(response.body).header('Authorization', 'Bearer ' + response.body.token);
+    res.status(response.status_code).setHeader('Authorization', 'Bearer ' + response.body.token).send(response.body);
 })
 
 app.post('/api/user/logout', middleware.check_authorization, async(req, res) => {
-    let response = await user.logout_user(helper.get_token_from_headers(req));
-    res.status(response.status_code).send(response.body).removeHeader('Authorization');
+    let response = await user.logout_user(req);
+    res.status(response.status_code).send(response.body);
 })
 
 app.put('/api/user/:nik', async(req, res) => {
@@ -57,6 +57,6 @@ app.get('/api/role/:id_role?', async(req, res) => {
 
 
 app.get('/api/check-token', async(req, res) => {
-    let response = await helper.verify_token(req.body.token);
+    let response = await helper.verify_token(req);
     res.status(response.status_code).send(response.body);
 })

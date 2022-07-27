@@ -9,11 +9,11 @@ module.exports = {
         if (header_authorization) {
             let token = header_authorization.split(" ")[1]
             if (!helper.check_token(token)) { //check if token is in token.js
-                res.status(401).send({ "status": "Error", "message": "user not logged in" });
+                res.status(401).send({ "status": "Error", "message": "Token Invalid" });
                 return;
             }
         } else {
-            res.status(401).send({ "status": "Error", "message": "user not logged in" });
+            res.status(400).send({ "status": "Error", "message": "User are not logged in" });
             return;
         }
         next();
