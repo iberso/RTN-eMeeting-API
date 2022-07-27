@@ -32,7 +32,7 @@ app.post('/api/user', async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
-app.post('/api/user/login', async(req, res) => {
+app.post('/api/user/login', middleware.check_login, async(req, res) => {
     let response = await user.login_user(req.body);
     res.status(response.status_code).setHeader('Authorization', 'Bearer ' + response.body.token).send(response.body);
 })
