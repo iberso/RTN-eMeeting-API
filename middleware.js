@@ -24,17 +24,14 @@ module.exports = {
         if (header_authorization) {
             let result = helper.verify_token(req)
             result.then(function(value) {
-                console.log(result)
-                if (value.status_code === 401 || value.status_code === 404) {
-                    res.status(value.status_code).send(value.body);
-                    return;
-                } else {
+                if (value.status_code != 401) {
                     next();
                 }
+                res.status(value.status_code).send(value.body);
+                return;
             });
-
         } else {
-            res.status(400).send({ "status": "Error", "message": "User are not logged in" });
+            res.status(401).send({ "status": "Error", "message": "User are not logged in" });
             return;
         }
     }
