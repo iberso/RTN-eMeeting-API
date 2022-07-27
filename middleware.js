@@ -1,6 +1,5 @@
 const helper = require('./helper');
 
-let PRIVATE_KEY = "halo-semua-nya";
 
 module.exports = {
 

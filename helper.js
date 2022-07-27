@@ -5,8 +5,7 @@ const { rejects } = require('assert');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const { json } = require('body-parser');
-
-let PRIVATE_KEY = "halo-semua-nya";
+require('dotenv').config();
 
 module.exports = {
     // async verify_token(req) {
@@ -29,11 +28,13 @@ module.exports = {
     async verify_token(req) {
         let token = this.get_token_from_headers(req);
         try {
-            let result = await jwt.verify(token, PRIVATE_KEY);
-            if (result) {
-                if (this.check_token(token)) {
+            let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+            if (this.check_token(token)) {
+                if (result) {
                     return this.http_response(null, 'Success', 'token valid', 200)
                 }
+                this.remove_token(token)
+                return this.http_response(null, 'Error', 'token Expired', 401)
             }
             return this.http_response(null, 'Error', 'token Expired', 401)
         } catch (err) {

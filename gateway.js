@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const { json } = require("express");
 const helper = require('./helper');
 const middleware = require('./middleware');
+require('dotenv').config();
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get('/api/user/:nik?', middleware.check_authorization, async(req, res) => {
 
 app.post('/api/user', async(req, res) => {
     let response = await user.add_user(req.body);
+    res.status(response.status_code).send(response.body);
 })
 
 app.post('/api/user/login', async(req, res) => {
@@ -40,12 +42,12 @@ app.post('/api/user/logout', middleware.check_authorization, async(req, res) => 
     res.status(response.status_code).send(response.body);
 })
 
-app.put('/api/user/:nik', async(req, res) => {
+app.put('/api/user/:nik', middleware.check_authorization, async(req, res) => {
     let response = await user.edit_user(req.body, req.params.nik);
     res.status(response.status_code).send(response.body);
 })
 
-app.get('/api/role/:id_role?', async(req, res) => {
+app.get('/api/role/:id_role?', middleware.check_authorization, async(req, res) => {
     if (req.params.id_role) {
         let response = await role.get_user_role_by_id(req.params.id_role);
         res.status(response.status_code).send(response.body);
@@ -61,4 +63,4 @@ app.get('/api/check-token', async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
-console.log(Math.floor(Date.now() / 1000) + (60 * 2))
+console.log(process.env.JWT_SECRET_KEY)
