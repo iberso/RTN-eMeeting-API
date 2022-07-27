@@ -56,7 +56,7 @@ module.exports = {
 
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
-                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), data: res_data }, PRIVATE_KEY, { algorithm: 'HS256' });
+                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 2), data: res_data }, PRIVATE_KEY, { algorithm: 'HS256' });
                 helper.add_token(token)
                 return helper.http_response(null, 'Success', "Successfully logged in", 200, token);
             } else {

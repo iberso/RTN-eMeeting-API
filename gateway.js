@@ -60,3 +60,5 @@ app.get('/api/check-token', async(req, res) => {
     let response = await helper.verify_token(req);
     res.status(response.status_code).send(response.body);
 })
+
+console.log(Math.floor(Date.now() / 1000) + (60 * 2))
