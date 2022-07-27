@@ -34,6 +34,18 @@ module.exports = {
             res.status(401).send({ "status": "Error", "message": "User are not logged in" });
             return;
         }
+    },
+    check_login(req, res, next) {
+        let header_authorization = req.header('authorization');
+        if (header_authorization) {
+            let result = helper.verify_token(req)
+            result.then(function(value) {
+                if (value.status_code === 200) {
+                    res.status(value.status_code).send({ "status": "Success", "message": "Successfully logged in" })
+                    return;
+                }
+            });
+        }
+        next();
     }
-
 }
