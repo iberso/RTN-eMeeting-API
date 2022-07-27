@@ -31,8 +31,12 @@ module.exports = {
             let result = helper.verify_token(req)
             result.then(function(value) {
                 if (value.status_code === 200) {
-                    res.status(value.status_code).send({ "status": "Success", "message": "Already logged in" })
-                    return;
+                    if (helper.check_token(helper.get_token_from_headers(req))) {
+                        res.status(value.status_code).send({ "status": "Success", "message": "Already logged in" })
+                        return;
+                    } else {
+                        next();
+                    }
                 } else {
                     next();
                 }
