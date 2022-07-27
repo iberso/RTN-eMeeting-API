@@ -9,6 +9,23 @@ const { json } = require('body-parser');
 let PRIVATE_KEY = "halo-semua-nya";
 
 module.exports = {
+    // async verify_token(req) {
+    //     let token = this.get_token_from_headers(req);
+    //     try {
+    //         let result = await jwt.verify(token, PRIVATE_KEY);
+    //         console.log(result)
+    //         if (result) {
+    //             if (!this.check_token(token)) {
+    //                 return this.http_response(null, 'Error', 'invalid token', 401)
+    //             }
+    //             return this.http_response(null, 'Success', 'token valid', 200)
+    //         } else {
+    //             return this.http_response(null, 'Error', 'invalid token', 401)
+    //         }
+    //     } catch (err) {
+    //         return this.http_response(null, 'Error', 'token Expired', 404)
+    //     }
+    // },
     async verify_token(req) {
         let token = this.get_token_from_headers(req);
         try {
@@ -20,13 +37,12 @@ module.exports = {
                 }
                 return this.http_response(null, 'Success', 'token valid', 200)
             } else {
-                return this.http_response(null, 'Error', 'invalid token', 401)
+                return this.http_response(null, 'Error', 'token Expired', 404)
             }
         } catch (err) {
-            return this.http_response(null, 'Error', 'token Expired', 404)
+            return this.http_response(null, 'Error', 'invalid token', 401)
         }
     },
-
     http_response(data = null, status = null, message = null, status_code = 200, token = null) {
         let body = {};
         body.status = status;
