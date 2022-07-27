@@ -70,33 +70,33 @@ module.exports = {
         });
     },
 
-    // add_token(client_token) {
-    //     let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-    //     list_token.tokens.push(client_token)
-    //     fs.writeFile('./files/token.json', JSON.stringify(list_token), (err) => {
-    //         if (err) console.log('Error writing file:', err)
-    //     })
-    // },
+    add_token(client_token) {
+        let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+        list_token.tokens.push(client_token)
+        fs.writeFile('./files/token.json', JSON.stringify(list_token), (err) => {
+            if (err) console.log('Error writing file:', err)
+        })
+    },
 
-    // remove_token(client_token) {
-    //     let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-    //     let remaining_token = list_token.tokens.filter(data => data != client_token);
-    //     fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
-    //         if (err) console.log('Error writing file:', err)
-    //     })
-    // },
+    remove_token(client_token) {
+        let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+        let remaining_token = list_token.tokens.filter(data => data != client_token);
+        fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
+            if (err) console.log('Error writing file:', err)
+        })
+    },
 
-    // check_token(client_token) {
-    //     let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-    //     let flag = false
-    //     for (let index = 0; index < list_token.tokens.length; index++) {
-    //         if (list_token.tokens[index] === client_token) {
-    //             return flag = true;
-    //         }
-    //     }
-    //     return flag;
+    check_token(client_token) {
+        let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+        let flag = false
+        for (let index = 0; index < list_token.tokens.length; index++) {
+            if (list_token.tokens[index] === client_token) {
+                return flag = true;
+            }
+        }
+        return flag;
 
-    // },
+    },
 
     get_token_from_headers(req) {
         let header_authorization = req.header('authorization');
