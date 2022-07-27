@@ -1,12 +1,13 @@
 let mysql = require('mysql');
 let util = require('util')
+require('dotenv').config();
 
 let pool = mysql.createPool({
     connectionLimit: 100,
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'db_emeeting',
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
     dateStrings: [
         'DATE',
         'DATETIME'

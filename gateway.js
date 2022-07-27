@@ -9,10 +9,10 @@ require('dotenv').config();
 
 const app = express();
 
-const port = 3000;
+const port = process.env.PORT;
 
 app.listen(port, () => {
-    console.log(`listening at http://localhost:${port}`)
+    console.log(`listening at ${port}`)
 });
 
 app.use(bodyParser.json());
