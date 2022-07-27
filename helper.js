@@ -4,9 +4,29 @@ const { resolve } = require('path');
 const { rejects } = require('assert');
 
 const fs = require('fs');
+const { json } = require('body-parser');
 
 
 module.exports = {
+    async verify_token(token) {
+        try {
+            let result = await jwt.verify(token, PRIVATE_KEY);
+            console.log(result)
+            if (result) {
+                return this.http_response(null, 'Success', 'token valid', 200)
+            } else {
+                return this.http_response(null, 'Error', 'token invalid', 404)
+            }
+        } catch (err) {
+            if (this.check_token(token)) {
+                this.remove_token(token)
+                return this.http_response(null, 'Errorr', err, 404)
+            } else {
+                return this.http_response(null, 'Error', 'token Expired', 404)
+            }
+        }
+    },
+
     http_response(data = null, status = null, message = null, status_code = 200, token = null) {
         let body = {};
         body.status = status;
@@ -39,9 +59,7 @@ module.exports = {
 
     add_token(client_token) {
         let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        let token_obj = { "value": client_token };
-        list_token.tokens.push(token_obj)
-
+        list_token.tokens.push(client_token)
         fs.writeFile('./files/token.json', JSON.stringify(list_token), (err) => {
             if (err) console.log('Error writing file:', err)
         })
@@ -49,36 +67,28 @@ module.exports = {
 
     remove_token(client_token) {
         let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        remaining_token = list_token.tokens.filter(data => data.value != client_token);
-        console.log(remaining_token)
-        fs.writeFile('./files/token.json', JSON.stringify(remaining_token), (err) => {
+        remaining_token = list_token.tokens.filter(data => data != client_token);
+        fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
             if (err) console.log('Error writing file:', err)
         })
     },
 
     check_token(client_token) {
         let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        console.log(list_token)
         let flag = false
-        list_token.tokens.forEach(token => {
-            if (token.value === client_token) {
+        for (let index = 0; index < list_token.tokens.length; index++) {
+            if (list_token.tokens[index] === client_token) {
                 return flag = true;
             }
-        });
+        }
         return flag;
+
     },
 
-    check_header(req, res, next) {
-
-
+    get_token_from_headers(req) {
         let header_authorization = req.header('authorization');
         if (header_authorization) {
-            let token = header_authorization.split(" ")[1]
-            if (!helper.check_token(token)) {
-                res.status(401).send({ "status": "Error", "message": "Unauthorized" });
-                return;
-            }
+            return header_authorization.split(" ")[1]
         }
-        next();
     }
 }

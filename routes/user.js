@@ -5,6 +5,7 @@ let util = require('util');
 const uuid = require('uuid');
 const bcrypt = require("bcrypt");
 
+let PRIVATE_KEY = "halo-semua-nya";
 
 module.exports = {
     async get_user(nik) {
@@ -38,7 +39,6 @@ module.exports = {
         if (api_response.status_code != 200) {
             return helper.http_response(null, 'Error', 'User not found', 404)
         }
-
         let sql = 'SELECT * FROM user WHERE nik = ?'
         let value = [user.nik]
         try {
@@ -56,7 +56,7 @@ module.exports = {
 
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
-                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 1), data: res_data }, "disini_private_key", { algorithm: 'HS256' });
+                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 1), data: res_data }, PRIVATE_KEY, { algorithm: 'HS256' });
                 helper.add_token(token)
                 return helper.http_response(null, 'Success', "Successfully logged in", 200, token);
             } else {
@@ -65,6 +65,16 @@ module.exports = {
             }
         } catch (err) {
             return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+        }
+    },
+
+
+    async logout_user(token) {
+        if (helper.check_token(token)) {
+            helper.remove_token(token);
+            return helper.http_response(null, 'Success', 'User logged out successfully')
+        } else {
+            return helper.http_response(null, 'Error', 'token invalid', 404)
         }
     },
 
@@ -143,19 +153,7 @@ module.exports = {
 
     },
 
-    async check_token(token) {
-        try {
-            let result = await jwt.verify(token, 'disini_private_key');
 
-            if (result) {
-                return helper.http_response(null, 'Success', 'token valid', 200)
-            } else {
-                return helper.http_response(null, 'Error', 'token invalid', 404)
-            }
-        } catch (err) {
-            return helper.http_response(null, 'Error', err, 404)
-        }
-    }
 };
 
 
