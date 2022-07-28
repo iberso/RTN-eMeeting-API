@@ -21,18 +21,15 @@ module.exports = {
         }
     },
 
-    //token valid belum exp != login next()
-    //token valid exp == login next()
-    //token invalid != login next()
     check_login(req, res, next) {
         let header_authorization = req.header('authorization');
-        console.log(header_authorization)
         if (header_authorization) {
             let result = helper.verify_token(req)
             result.then(function(value) {
+                console.log(value)
                 if (value.status_code === 200) {
                     if (helper.check_token(helper.get_token_from_headers(req))) {
-                        res.status(value.status_code).send({ "status": "Success", "message": "Already logged in" })
+                        res.status(value.status_code).send({ "status": "Success", "message": "Already logged in" });
                         return;
                     } else {
                         next();

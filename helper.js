@@ -7,6 +7,7 @@ const fs = require('fs');
 const { json } = require('body-parser');
 require('dotenv').config();
 
+let tokens = [];
 module.exports = {
     // async verify_token(req) {
     //     let token = this.get_token_from_headers(req);
@@ -36,6 +37,9 @@ module.exports = {
             }
         } catch (err) {
             //catch if token invalid
+            if (this.check_token(token)) {
+                console.log("adanih")
+            }
             return this.http_response(null, 'Error', 'invalid token', 401)
         }
     },
@@ -71,31 +75,47 @@ module.exports = {
     },
 
     add_token(client_token) {
-        let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        list_token.tokens.push(client_token)
-        fs.writeFile('./files/token.json', JSON.stringify(list_token), (err) => {
-            if (err) console.log('Error writing file:', err)
-        })
+        // let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+        // console.log(list_token.tokens)
+        // list_token.tokens.push(client_token)
+
+        // console.log(list_token.tokens.length)
+        // fs.writeFile('./files/token.json', JSON.stringify(list_token), (err) => {
+        //     if (err) console.log('Error writing file:', err)
+        // })
+        tokens.push(client_token);
     },
 
     remove_token(client_token) {
-        let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        let remaining_token = list_token.tokens.filter(data => data != client_token);
-        fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
-            if (err) console.log('Error writing file:', err)
-        })
+        // let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+        // let remaining_token = list_token.tokens.filter(data => data != client_token);
+        // fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
+        //     if (err) console.log('Error writing file:', err)
+        // })
+        let tokens = tokens.filter(data => data != client_token);
     },
 
     check_token(client_token) {
-        let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+        // let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
+        // let flag = false
+        // for (let index = 0; index < list_token.tokens.length; index++) {
+        //     if (list_token.tokens[index] === client_token) {
+        //         return flag = true;
+        //     }
+        // }
+        // return flag;
         let flag = false
-        for (let index = 0; index < list_token.tokens.length; index++) {
-            if (list_token.tokens[index] === client_token) {
+        for (let index = 0; index < tokens.length; index++) {
+            if (tokens[index] === client_token) {
                 return flag = true;
             }
         }
         return flag;
 
+    },
+
+    get_all_tokens() {
+        return tokens;
     },
 
     get_token_from_headers(req) {

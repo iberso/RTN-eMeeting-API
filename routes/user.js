@@ -52,7 +52,6 @@ module.exports = {
                 'gender': data[0].gender,
                 'date_of_birth': data[0].date_of_birth
             }
-
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
                 const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), data: res_data }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
@@ -60,13 +59,11 @@ module.exports = {
                 return helper.http_response(null, 'Success', "Successfully logged in", 200, token);
             } else {
                 return helper.http_response(null, 'Unauthorized', "Invalid Credentials (Wrong Password)", 401)
-
             }
         } catch (err) {
-            return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+            return helper.http_response(null, 'Error', "Database error occurredd: " + err, 500)
         }
     },
-
 
     async logout_user(req) {
         let token = helper.get_token_from_headers(req);
@@ -116,9 +113,12 @@ module.exports = {
         }
     },
 
-    async edit_user(user, nik) {
-        console.log("erree")
-        let api_response = await this.get_user(nik);
+    async edit_user(req) {
+        let token = helper.get_token_from_headers(req);
+        let decoded_token = jwt.decode(token)
+        let user = req.body;
+
+        let api_response = await this.get_user(decoded_token.data.nik);
         if (api_response.status_code === 404) {
             return helper.http_response(null, 'Error', 'User not found', 404)
         }
@@ -133,12 +133,12 @@ module.exports = {
             user.phone_number,
             user.gender,
             user.date_of_birth,
-            nik
+            decoded_token.data.nik
         ];
         try {
             await pool.query(sql, value);
             data = {
-                'nik': nik,
+                'nik': decoded_token.data.nik,
                 'username': user.username,
                 'email_address': user.email_address,
                 'id_role': user.id_role,

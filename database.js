@@ -8,6 +8,7 @@ let pool = mysql.createPool({
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
+    port: process.env.DATABASE_PORT,
     dateStrings: [
         'DATE',
         'DATETIME'
@@ -26,7 +27,7 @@ pool.getConnection((err, connection) => {
             console.error('Database connection was refused.')
         }
     }
-
+    console.log(`Database Status : ${connection.state}`)
     if (connection) connection.release()
 
     return
