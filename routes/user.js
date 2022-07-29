@@ -60,6 +60,7 @@ module.exports = {
                 'nik': user.nik,
                 'email_address': user.email_address,
             }
+            helper.send_mail(user.email_address, "E Meeting Mailer - Default Password", "Your E Meeting Default password is: " + default_password);
             return helper.http_response(data, 'success', "account created successfully", 201);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)

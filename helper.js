@@ -5,6 +5,8 @@ const { rejects } = require('assert');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const { json } = require('body-parser');
+const nodemailer = require('nodemailer');
+
 require('dotenv').config();
 
 let tokens = [];
@@ -124,5 +126,43 @@ module.exports = {
         if (header_authorization) {
             return header_authorization.split(" ")[1]
         }
+    },
+
+    get_cookie(req) {
+        let list_cookie = req.header('cookie').split("; ");
+        let flag;
+        for (let idx = 0; idx < list_cookie.length; idx++) {
+            if (list_cookie[idx].match("SESSID=")) {
+                flag = idx;
+            }
+        }
+        if (flag) {
+            console.log(list_cookie[flag]);
+        }
+    },
+
+    send_mail(user_email, subject, text) {
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_ADDRESS,
+                pass: process.env.EMAIL_APP_KEY
+            }
+        });
+
+        let mailOption = {
+            from: process.env.EMAIL_ADDRESS,
+            to: user_email,
+            subject: subject,
+            text: text
+        }
+
+        transporter.sendMail(mailOption, function(err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("email send");
+            }
+        });
     }
 }

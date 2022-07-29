@@ -1,6 +1,5 @@
 const user = require('./routes/user');
 const meeting = require('./routes/meeting');
-const role = require('./routes/role');
 const express = require('express');
 const bodyParser = require('body-parser')
 const { json } = require("express");
@@ -82,6 +81,12 @@ app.get('/api/all-token', async(req, res) => {
     res.status(200).send(helper.get_all_tokens());
 })
 
+app.get('/api/set', (req, res) => {
+    res.cookie("SESSID", 1234567, { httpOnly: true }).send("hai");
+});
+app.get('/api/get', (req, res) => {
+    helper.get_cookie(req);
+});
 //TODO LIST
 //NIK dan Email
 
