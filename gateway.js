@@ -38,16 +38,19 @@ app.get('/api/user/:nik?', middleware.check_authorization, async(req, res) => {
     }
 })
 
-app.post('/api/user', async(req, res) => {
+//DONE
+app.post('/api/user', middleware.check_body, async(req, res) => {
     let response = await user.add_user(req.body);
     res.status(response.status_code).send(response.body);
 })
 
-app.post('/api/user/login', middleware.check_login, async(req, res) => {
+//DONE
+app.post('/api/user/login', middleware.check_body, middleware.check_login, async(req, res) => {
     let response = await user.login_user(req.body);
     res.status(response.status_code).send(response.body)
 })
 
+//ON-GOING
 app.post('/api/user/logout', middleware.check_authorization, async(req, res) => {
     let response = await user.logout_user(req);
     res.status(response.status_code).send(response.body);
@@ -89,3 +92,15 @@ app.get('/api/check-token', async(req, res) => {
 app.get('/api/all-token', async(req, res) => {
     res.status(200).send(helper.get_all_tokens());
 })
+
+app.post('/api/test/body', async(req, res) => {
+
+});
+//TODO LIST
+//NIK dan Email
+
+//TODO EDIT
+//Email
+
+//password random
+//add foto manual

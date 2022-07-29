@@ -9,14 +9,14 @@ require('dotenv').config();
 module.exports = {
     async get_user(nik) {
         try {
-            data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user WHERE nik = ?', [nik])
+            data = await pool.query('SELECT nik,email_address,device_token FROM user WHERE nik = ?', [nik])
             if (data.length != 0) {
-                return helper.http_response(data[0], 'Success', null);
+                return helper.http_response(data[0], 'success', null);
             } else {
-                return helper.http_response(null, 'Error', 'User not found', 404)
+                return helper.http_response(null, 'error', 'User not found', 404)
             }
         } catch (err) {
-            return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
 
@@ -24,44 +24,74 @@ module.exports = {
         try {
             data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user')
             if (data.length != 0) {
-                return helper.http_response(data, 'Success', null);
+                return helper.http_response(data, 'success', null);
             } else {
-                return helper.http_response(null, 'Error', 'Data User is empty', 404)
+                return helper.http_response(null, 'error', 'Data User is empty', 404)
             }
         } catch (err) {
-            return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    },
+
+    async add_user(user) {
+        if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
+        if (!user.email_address) return helper.http_response(null, 'error', 'email address is not present in body', 400);
+
+        let api_response = await this.get_user(user.nik);
+        if (api_response.status_code === 200) return helper.http_response(null, 'error', 'User already exist', 400);
+
+        let default_password = Math.floor(100000 + Math.random() * 900000).toString();
+
+        console.log(user.nik + " " + default_password)
+
+        const hash_password = await bcrypt.hash(default_password, 10);
+
+        let sql = 'INSERT INTO user (nik,email_address,password) VALUES (?,?,?)';
+        let value = [
+            user.nik,
+            user.email_address,
+            hash_password
+        ];
+
+        try {
+            await pool.query(sql, value);
+            data = {
+                'nik': user.nik,
+                'email_address': user.email_address,
+            }
+            return helper.http_response(data, 'success', "account created successfully", 201);
+        } catch (err) {
+            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
     },
 
     async login_user(user) {
+        if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
+        if (!user.password) return helper.http_response(null, 'error', 'password is not present in body', 400);
+
         let api_response = await this.get_user(user.nik);
-        if (api_response.status_code != 200) {
-            return helper.http_response(null, 'Error', 'User not found', 404)
-        }
+
+        if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
+
         let sql = 'SELECT * FROM user WHERE nik = ?'
         let value = [user.nik]
         try {
             let data = await pool.query(sql, value);
             let res_data = {
                 'nik': data[0].nik,
-                'username': data[0].username,
                 'email_address': data[0].email_address,
-                'id_role': data[0].id_role,
                 'device_token': data[0].device_token,
-                'phone_number': data[0].phone_number,
-                'gender': data[0].gender,
-                'date_of_birth': data[0].date_of_birth
             }
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
                 const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), data: res_data }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
                 helper.add_token(token)
-                return helper.http_response(null, 'Success', "Successfully logged in", 200, token);
+                return helper.http_response(null, 'success', "Successfully logged in", 200, token);
             } else {
                 return helper.http_response(null, 'Unauthorized', "Invalid Credentials (Wrong Password)", 401)
             }
         } catch (err) {
-            return helper.http_response(null, 'Error', "Database error occurredd: " + err, 500)
+            return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
         }
     },
 
@@ -69,49 +99,12 @@ module.exports = {
         let token = helper.get_token_from_headers(req);
         if (helper.check_token(token)) {
             helper.remove_token(token);
-            return helper.http_response(null, 'Success', 'User logged out successfully')
+            return helper.http_response(null, 'success', 'User logged out successfully')
         } else {
-            return helper.http_response(null, 'Error', 'token invalid', 404)
+            return helper.http_response(null, 'error', 'token invalid', 400)
         }
     },
 
-    async add_user(user) {
-        let api_response = await get_user(user.nik);
-        if (api_response.status_code === 200) {
-            return helper.http_response(null, 'Error', 'User already exist', 404)
-        }
-        const hash_password = await bcrypt.hash(user.date_of_birth.split('-').join(""), 10);
-
-        let sql = 'INSERT INTO user (nik,username,email_address,id_role,password,device_token,phone_number,gender,date_of_birth) VALUES (?,?,?,?,?,?,?,?,?)';
-        let value = [
-            user.nik,
-            user.username,
-            user.email_address,
-            user.id_role,
-            hash_password,
-            user.device_token,
-            user.phone_number,
-            user.gender,
-            user.date_of_birth
-        ];
-        try {
-            await pool.query(sql, value);
-            data = {
-                'nik': user.nik,
-                'username': user.username,
-                'email_address': user.email_address,
-                'id_role': user.id_role,
-                'password': user.date_of_birth.split('-').join(""),
-                'device_token': user.device_token,
-                'phone_number': user.phone_number,
-                'gender': user.gender,
-                'date_of_birth': user.date_of_birth
-            }
-            return helper.http_response(data, 'Success', "Account created successfully", 201);
-        } catch (err) {
-            return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
-        }
-    },
 
     async edit_user(req) {
         let token = helper.get_token_from_headers(req);
@@ -120,7 +113,7 @@ module.exports = {
 
         let api_response = await this.get_user(decoded_token.data.nik);
         if (api_response.status_code === 404) {
-            return helper.http_response(null, 'Error', 'User not found', 404)
+            return helper.http_response(null, 'error', 'User not found', 404)
         }
 
         let sql = 'UPDATE user SET username = ?, email_address = ?, id_role = ?, device_token = ?, phone_number = ?, gender = ?, date_of_birth = ? WHERE nik = ?';
@@ -147,9 +140,9 @@ module.exports = {
                 'gender': user.gender,
                 'date_of_birth': user.date_of_birth
             }
-            return helper.http_response(data, 'Success', "Account updated successfully");
+            return helper.http_response(data, 'success', "Account updated successfully");
         } catch (err) {
-            return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
 
     },
@@ -162,7 +155,7 @@ module.exports = {
 
         let api_response = await this.get_user(decoded_token.data.nik);
         if (api_response.status_code === 404) {
-            return helper.http_response(null, 'Error', 'User not found', 404)
+            return helper.http_response(null, 'error', 'User not found', 404)
         }
 
         let sql = 'UPDATE user SET password = ? WHERE nik = ?';
@@ -172,9 +165,9 @@ module.exports = {
 
         try {
             await pool.query(sql, value);
-            return helper.http_response(null, 'Success', "Password Changes successfully");
+            return helper.http_response(null, 'success', "Password Changes successfully");
         } catch (err) {
-            return helper.http_response(null, 'Error', "Database error occurred: " + err.message, 500)
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     }
 

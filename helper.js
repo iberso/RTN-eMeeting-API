@@ -92,7 +92,8 @@ module.exports = {
         // fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
         //     if (err) console.log('Error writing file:', err)
         // })
-        let tokens = tokens.filter(data => data != client_token);
+        let new_list_tokens = tokens.filter(data => data != client_token);
+        tokens = new_list_tokens;
     },
 
     check_token(client_token) {

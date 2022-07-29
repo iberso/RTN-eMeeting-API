@@ -26,7 +26,6 @@ module.exports = {
         if (header_authorization) {
             let result = helper.verify_token(req)
             result.then(function(value) {
-                console.log(value)
                 if (value.status_code === 200) {
                     if (helper.check_token(helper.get_token_from_headers(req))) {
                         res.status(value.status_code).send({ "status": "Success", "message": "Already logged in" });
@@ -38,6 +37,15 @@ module.exports = {
                     next();
                 }
             });
+        } else {
+            next();
+        }
+    },
+
+    check_body(req, res, next) {
+        if (!Object.keys(req.body).length) {
+            res.status(400).send({ "status": "Error", "message": "Body is missing" });
+            return;
         } else {
             next();
         }
