@@ -28,6 +28,8 @@ app.get('/api', async(req, res) => {
 })
 
 //User
+
+//DONE
 app.get('/api/user/:nik?', middleware.check_authorization, async(req, res) => {
     if (req.params.nik) {
         let response = await user.get_user(req.params.nik);
@@ -56,20 +58,12 @@ app.post('/api/user/logout', middleware.check_authorization, async(req, res) => 
     res.status(response.status_code).send(response.body);
 })
 
+//DONE
 app.put('/api/user', middleware.check_authorization, middleware.check_body, async(req, res) => {
     let response = await user.edit_user(req);
     res.status(response.status_code).send(response.body);
 })
 
-app.get('/api/role/:id_role?', middleware.check_authorization, async(req, res) => {
-    if (req.params.id_role) {
-        let response = await role.get_user_role_by_id(req.params.id_role);
-        res.status(response.status_code).send(response.body);
-    } else {
-        let response = await role.get_all_user_roles();
-        res.status(response.status_code).send(response.body);
-    }
-});
 
 // Meeting
 app.get('/api/meeting', async(req, res) => {
@@ -88,9 +82,6 @@ app.get('/api/all-token', async(req, res) => {
     res.status(200).send(helper.get_all_tokens());
 })
 
-app.post('/api/test/body', async(req, res) => {
-
-});
 //TODO LIST
 //NIK dan Email
 

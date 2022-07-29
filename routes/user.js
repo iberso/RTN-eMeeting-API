@@ -23,7 +23,7 @@ module.exports = {
 
     async get_all_users() {
         try {
-            data = await pool.query('SELECT nik,username,email_address,id_role,device_token,phone_number,gender,date_of_birth FROM user')
+            data = await pool.query('SELECT nik,email_address,device_token FROM user')
             if (data.length != 0) {
                 return helper.http_response(data, 'success', null);
             } else {
@@ -105,7 +105,6 @@ module.exports = {
             return helper.http_response(null, 'error', 'token invalid', 400)
         }
     },
-
 
     async edit_user(req) {
         let user = req.body;
