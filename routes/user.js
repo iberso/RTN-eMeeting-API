@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 let util = require('util');
 const uuid = require('uuid');
 const bcrypt = require("bcrypt");
+const { urlencoded } = require('body-parser');
 require('dotenv').config();
 
 module.exports = {
@@ -107,68 +108,48 @@ module.exports = {
 
 
     async edit_user(req) {
+        let user = req.body;
+        if (!user.new_password && !user.email_address) return helper.http_response(null, 'error', 'new password or email address is not present in body', 400)
+
         let token = helper.get_token_from_headers(req);
         let decoded_token = jwt.decode(token)
-        let user = req.body;
 
         let api_response = await this.get_user(decoded_token.data.nik);
-        if (api_response.status_code === 404) {
-            return helper.http_response(null, 'error', 'User not found', 404)
-        }
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
 
-        let sql = 'UPDATE user SET username = ?, email_address = ?, id_role = ?, device_token = ?, phone_number = ?, gender = ?, date_of_birth = ? WHERE nik = ?';
+        const hash_password = await bcrypt.hash(user.new_password, 10);
+
+        let sql = 'UPDATE user SET email_address = ?, password = ? WHERE nik = ?';
 
         let value = [
-            user.username,
             user.email_address,
-            user.id_role,
-            user.device_token,
-            user.phone_number,
-            user.gender,
-            user.date_of_birth,
+            hash_password,
             decoded_token.data.nik
         ];
+
+        if (user.email_address && !user.password) {
+            sql = 'UPDATE user SET email_address = ? WHERE nik = ?';
+            value = [
+                user.email_address,
+                decoded_token.data.nik
+            ];
+        } else if (!user.email_address && user.password) {
+            sql = 'UPDATE user SET password = ? WHERE nik = ?';
+            value = [
+                hash_password,
+                decoded_token.data.nik
+            ];
+        }
+
         try {
             await pool.query(sql, value);
             data = {
                 'nik': decoded_token.data.nik,
-                'username': user.username,
                 'email_address': user.email_address,
-                'id_role': user.id_role,
-                'device_token': user.device_token,
-                'phone_number': user.phone_number,
-                'gender': user.gender,
-                'date_of_birth': user.date_of_birth
             }
             return helper.http_response(data, 'success', "Account updated successfully");
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
-
     },
-
-    async change_password(req) {
-        let token = helper.get_token_from_headers(req);
-        let decoded_token = jwt.decode(token)
-        let user = req.body;
-        console.log(decoded_token)
-
-        let api_response = await this.get_user(decoded_token.data.nik);
-        if (api_response.status_code === 404) {
-            return helper.http_response(null, 'error', 'User not found', 404)
-        }
-
-        let sql = 'UPDATE user SET password = ? WHERE nik = ?';
-        const hash_password = await bcrypt.hash(user.new_password, 10);
-
-        let value = [hash_password, decoded_token.data.nik];
-
-        try {
-            await pool.query(sql, value);
-            return helper.http_response(null, 'success', "Password Changes successfully");
-        } catch (err) {
-            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
-        }
-    }
-
 };

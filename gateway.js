@@ -50,18 +50,13 @@ app.post('/api/user/login', middleware.check_body, middleware.check_login, async
     res.status(response.status_code).send(response.body)
 })
 
-//ON-GOING
+//DONE
 app.post('/api/user/logout', middleware.check_authorization, async(req, res) => {
     let response = await user.logout_user(req);
     res.status(response.status_code).send(response.body);
 })
 
-app.put('/api/user/change-password', middleware.check_authorization, async(req, res) => {
-    let response = await user.change_password(req);
-    res.status(response.status_code).send(response.body);
-})
-
-app.put('/api/user', middleware.check_authorization, async(req, res) => {
+app.put('/api/user', middleware.check_authorization, middleware.check_body, async(req, res) => {
     let response = await user.edit_user(req);
     res.status(response.status_code).send(response.body);
 })
