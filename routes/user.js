@@ -60,7 +60,7 @@ module.exports = {
                 'nik': user.nik,
                 'email_address': user.email_address,
             }
-            helper.send_mail(user.email_address, "Default Password", default_password);
+            helper.send_mail(user.email_address, "Your account has been registered", default_password, user.email_address);
             return helper.http_response(data, 'success', "account created successfully", 201);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)

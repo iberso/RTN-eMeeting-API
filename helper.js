@@ -142,7 +142,7 @@ module.exports = {
         }
     },
 
-    send_mail(user_email, subject, default_password, text = null) {
+    send_mail(user_email, subject, default_password, email_address, text = null) {
         const template = fs.readFileSync('./template/index.html', 'utf8');
 
         let transporter = nodemailer.createTransport({
@@ -158,10 +158,16 @@ module.exports = {
                 name: 'Rutan E-Meeting Mailer',
                 address: process.env.EMAIL_ADDRESS
             },
+            // from: process.env.EMAIL_ADDRESS,
             to: user_email,
             subject: subject,
-            // text: text
-            html: mustache.render(template, { default_password })
+            text: "this email is sending your account default password",
+            html: mustache.render(template, { default_password, email_address }),
+            attachments: [{
+                filename: 'logo_rutan.png',
+                path: './assets/images/logo_rutan.png',
+                cid: 'logo_rutan'
+            }]
         }
 
         transporter.sendMail(mailOption, function(err, data) {
