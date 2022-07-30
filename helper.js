@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const { json } = require('body-parser');
 const nodemailer = require('nodemailer');
+const mustache = require('mustache');
 
 require('dotenv').config();
 
@@ -141,7 +142,9 @@ module.exports = {
         }
     },
 
-    send_mail(user_email, subject, text) {
+    send_mail(user_email, subject, default_password, text = null) {
+        const template = fs.readFileSync('./template/index.html', 'utf8');
+
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -151,10 +154,14 @@ module.exports = {
         });
 
         let mailOption = {
-            from: process.env.EMAIL_ADDRESS,
+            from: {
+                name: 'Rutan E-Meeting Mailer',
+                address: process.env.EMAIL_ADDRESS
+            },
             to: user_email,
             subject: subject,
-            text: text
+            // text: text
+            html: mustache.render(template, { default_password })
         }
 
         transporter.sendMail(mailOption, function(err, data) {
