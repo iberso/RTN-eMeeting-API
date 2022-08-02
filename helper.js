@@ -12,55 +12,44 @@ require('dotenv').config();
 
 let tokens = [];
 module.exports = {
-    // async verify_token(req) {
-    //     let token = this.get_token_from_headers(req);
-    //     try {
-    //         let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-    //         if (this.check_token(token)) {
-    //             if (result) {
-    //                 return this.http_response(null, 'Success', 'token valid', 200)
-    //             }
-    //             this.remove_token(token)
-    //             return this.http_response(null, 'Error', 'token Expired', 401)
-    //         }
-    //         return this.http_response(null, 'Error', 'token Expired', 401)
-    //     } catch (err) {
-    //         return this.http_response(null, 'Error', 'invalid token', 401)
-    //     }
-    // },
-
     async verify_token(req) {
         let token = this.get_token_from_headers(req);
         try {
             let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
             if (result) {
-                return this.http_response(null, 'Success', 'token valid', 200)
+                return this.http_response(null, 'success', 'token valid', 200)
             } else {
-                return this.http_response(null, 'Error', 'token Expired', 401)
+                return this.http_response(null, 'error', 'token Expired', 401)
             }
         } catch (err) {
-            //catch if token invalid
-            if (this.check_token(token)) {
-                console.log("adanih")
+            return this.http_response(null, 'error', 'invalid token', 401)
+        }
+    },
+
+    async extend_token(req) {
+        let token = this.get_token_from_headers(req);
+        if (token) {
+            try {
+                let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+                let decoded_token = jwt.decode(token);
+                console.log(decoded_token);
+                const new_token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (604800), data: decoded_token.data }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+                return this.http_response(null, 'success', null, 200, new_token);
+            } catch (err) {
+                return this.http_response(null, 'error', 'invalid token', 401)
             }
-            return this.http_response(null, 'Error', 'invalid token', 401)
+        } else {
+            return this.http_response(null, 'error', 'User are not logged in', 403);
         }
     },
 
     http_response(data = null, status = null, message = null, status_code = 200, token = null) {
         let body = {};
         body.status = status;
+        if (message != null) body.message = message;
+        if (data != null) body.data = data;
+        if (token != null) body.token = token;
 
-        if (message != null) {
-            body.message = message;
-        }
-
-        if (data != null) {
-            body.data = data;
-        }
-        if (token != null) {
-            body.token = token;
-        }
         return { status_code, body };
     },
 

@@ -27,8 +27,8 @@ pool.getConnection((err, connection) => {
             console.error('Database connection was refused.')
         }
     }
-    console.log(`Database Status : ${connection.state}`)
-    if (connection) connection.release()
+
+    if (connection) connection.release();
 
     return
 })

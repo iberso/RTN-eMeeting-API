@@ -57,10 +57,10 @@ module.exports = {
         try {
             await pool.query(sql, value);
             data = {
-                'nik': user.nik,
-                'email_address': user.email_address,
-            }
-            helper.send_mail(user.email_address, "Your account has been registered", default_password, user.email_address);
+                    'nik': user.nik,
+                    'email_address': user.email_address,
+                }
+                // helper.send_mail(user.email_address, "Your account has been registered", default_password, user.email_address);
             return helper.http_response(data, 'success', "account created successfully", 201);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
@@ -86,7 +86,7 @@ module.exports = {
             }
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
-                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 60), data: res_data }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 1), data: res_data }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
                 helper.add_token(token)
                 return helper.http_response(null, 'success', "Successfully logged in", 200, token);
             } else {

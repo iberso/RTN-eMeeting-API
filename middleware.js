@@ -16,7 +16,7 @@ module.exports = {
                 }
             });
         } else {
-            res.status(401).send({ "status": "Error", "message": "User are not logged in" });
+            res.status(403).send({ "status": "error", "message": "User are not logged in" });
             return;
         }
     },
@@ -28,11 +28,14 @@ module.exports = {
             result.then(function(value) {
                 if (value.status_code === 200) {
                     if (helper.check_token(helper.get_token_from_headers(req))) {
-                        res.status(value.status_code).send({ "status": "Success", "message": "Already logged in" });
+                        res.status(value.status_code).send({ "status": "success", "message": "Already logged in" });
                         return;
                     } else {
                         next();
                     }
+                } else if (value.status_code === 401) {
+                    res.status(value.status_code).send({ "status": "error", "message": "Token Invalid" });
+                    return;
                 } else {
                     next();
                 }
