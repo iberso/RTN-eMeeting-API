@@ -16,30 +16,37 @@ module.exports = {
         let token = this.get_token_from_headers(req);
         try {
             let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-            if (result) {
-                return this.http_response(null, 'success', 'token valid', 200)
-            } else {
-                return this.http_response(null, 'error', 'token Expired', 401)
-            }
+            return this.http_response(result.data, 'success', 'token valid', 200)
         } catch (err) {
-            return this.http_response(null, 'error', 'invalid token', 401)
+            if (this.check_token(token)) {
+                this.remove_token(token);
+            }
+            if (err.message === 'jwt expired') {
+                return this.http_response(null, 'error', 'token expired', 401);
+            } else {
+                return this.http_response(null, 'error', 'invalid token', 401)
+            }
         }
     },
 
     async extend_token(req) {
         let token = this.get_token_from_headers(req);
         if (token) {
-            try {
-                let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-                let decoded_token = jwt.decode(token);
-                console.log(decoded_token);
-                const new_token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (604800), data: decoded_token.data }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+            let result = await this.verify_token(req);
+            if (result.status_code === 401 && result.body.message === "token expired") {
+                let decoded = jwt.decode(token, process.env.JWT_SECRET_KEY);
+                const new_token = await jwt.sign({
+                    exp: Math.floor(Date.now() / 1000) +
+                        parseInt(process.env.JWT_EXP_TIME_IN_SECONDS),
+                    data: decoded.data
+                }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+                this.add_token(new_token);
                 return this.http_response(null, 'success', null, 200, new_token);
-            } catch (err) {
-                return this.http_response(null, 'error', 'invalid token', 401)
+            } else {
+                return result;
             }
         } else {
-            return this.http_response(null, 'error', 'User are not logged in', 403);
+            return this.http_response(null, 'error', 'user are not logged in', 403);
         }
     },
 
@@ -115,19 +122,6 @@ module.exports = {
         let header_authorization = req.header('authorization');
         if (header_authorization) {
             return header_authorization.split(" ")[1]
-        }
-    },
-
-    get_cookie(req) {
-        let list_cookie = req.header('cookie').split("; ");
-        let flag;
-        for (let idx = 0; idx < list_cookie.length; idx++) {
-            if (list_cookie[idx].match("SESSID=")) {
-                flag = idx;
-            }
-        }
-        if (flag) {
-            console.log(list_cookie[flag]);
         }
     },
 

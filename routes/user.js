@@ -8,9 +8,19 @@ const { urlencoded } = require('body-parser');
 require('dotenv').config();
 
 module.exports = {
-    async get_user(nik) {
+
+    async get_user(nik = null, req = null) {
+
+        let user_nik;
+        if (nik) {
+            user_nik = nik;
+        } else if (req) {
+            let token = helper.get_token_from_headers(req);
+            let decoded_token = jwt.decode(token, process.env.JWT_SECRET_KEY);
+            user_nik = decoded_token.data.nik;
+        }
         try {
-            data = await pool.query('SELECT nik,email_address,device_token FROM user WHERE nik = ?', [nik])
+            data = await pool.query('SELECT nik,email_address,device_token FROM user WHERE nik = ?', [user_nik])
             if (data.length != 0) {
                 return helper.http_response(data[0], 'success', null);
             } else {
@@ -86,7 +96,11 @@ module.exports = {
             }
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
-                const token = await jwt.sign({ exp: Math.floor(Date.now() / 1000) + (60 * 1), data: res_data }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+                const token = await jwt.sign({
+                    exp: Math.floor(Date.now() / 1000) +
+                        parseInt(process.env.JWT_EXP_TIME_IN_SECONDS),
+                    data: res_data
+                }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
                 helper.add_token(token)
                 return helper.http_response(null, 'success', "Successfully logged in", 200, token);
             } else {
@@ -103,7 +117,7 @@ module.exports = {
             helper.remove_token(token);
             return helper.http_response(null, 'success', 'User logged out successfully')
         } else {
-            return helper.http_response(null, 'error', 'token invalid', 400)
+            return helper.http_response(null, 'error', 'token invalid', 401)
         }
     },
 
