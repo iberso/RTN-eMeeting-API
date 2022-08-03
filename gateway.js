@@ -71,8 +71,8 @@ app.put('/api/user', middleware.check_authorization, middleware.check_body, asyn
 })
 
 // Meeting
-app.get('/api/meeting', async(req, res) => {
-    let response = await meeting.get_meeting(req);
+app.get('/api/meeting/:nik/:date', middleware.check_authorization, async(req, res) => {
+    let response = await meeting.get_user_meeting_by_date(req.params.nik, req.params.date);
     res.status(response.status_code).send(response.body);
 })
 
