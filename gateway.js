@@ -71,10 +71,16 @@ app.put('/api/user', middleware.check_authorization, middleware.check_body, asyn
 })
 
 // Meeting
-app.get('/api/meeting/:nik/:date', middleware.check_authorization, async(req, res) => {
-    let response = await meeting.get_user_meeting_by_date(req.params.nik, req.params.date);
-    res.status(response.status_code).send(response.body);
+app.get('/api/meeting/:nik/:date?', async(req, res) => {
+    if (req.params.date) {
+        let response = await meeting.get_user_meeting_by_date(req.params.nik, req.params.date);
+        res.status(response.status_code).send(response.body);
+    } else {
+        let response = await meeting.get_user_all_meeting(req.params.nik);
+        res.status(response.status_code).send(response.body);
+    }
 })
+
 
 //For Basic Checking
 app.get('/api/check-token', async(req, res) => {
@@ -86,9 +92,9 @@ app.get('/api/check-token', async(req, res) => {
 app.get('/api/all-token', async(req, res) => {
     res.status(200).send(helper.get_all_tokens());
 })
-
+let counter = 0;
 app.get('/api/token-extend', async(req, res) => {
-    console.log(counter++);
+    console.log("Token Updated : " + counter++);
     let response = await helper.extend_token(req);
     res.status(response.status_code).send(response.body);
 });
