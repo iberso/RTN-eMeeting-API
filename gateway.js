@@ -71,8 +71,15 @@ app.put('/api/user', middleware.check_authorization, middleware.check_body, asyn
 })
 
 // Meeting
-//DONE
-app.get('/api/meeting/:nik/:date?', async(req, res) => {
+
+//ON-GOING
+app.get('/api/meeting/:meeting_id', async(req, res) => {
+    let response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
+    res.status(response.status_code).send(response.body);
+})
+
+//DONE WITH REVISION
+app.get('/api/meeting/user/:nik/:date?', async(req, res) => {
     if (req.params.date) {
         let response = await meeting.get_user_meeting_by_date(req.params.nik, req.params.date);
         res.status(response.status_code).send(response.body);
@@ -80,13 +87,8 @@ app.get('/api/meeting/:nik/:date?', async(req, res) => {
         let response = await meeting.get_user_all_meeting(req.params.nik);
         res.status(response.status_code).send(response.body);
     }
-})
+});
 
-//ON-GOING
-app.get('/api/meeting/:meeting_id', async(req, res) => {
-    let response = await meeting.get_user_all_meeting(req.params.nik);
-    res.status(response.status_code).send(response.body);
-})
 
 //For Basic Checking
 app.get('/api/check-token', async(req, res) => {

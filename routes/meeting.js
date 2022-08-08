@@ -28,8 +28,8 @@ module.exports = {
         }
     },
 
-    async get_all_participants_by_meeting_id(id_meeting) {
-        let query = 'SELECT * FROM meeting_participant WHERE id_meeting = ?';
+    async get_meeting_by_meeting_id(id_meeting) {
+        let query = 'SELECT * FROM meeting WHERE id_meeting = ?';
         let values = [id_meeting];
         try {
             let data = await pool.query(query, values);
