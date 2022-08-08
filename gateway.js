@@ -89,7 +89,6 @@ app.get('/api/meeting/user/:nik/:date?', async(req, res) => {
     }
 });
 
-
 //For Basic Checking
 app.get('/api/check-token', async(req, res) => {
     let response = await helper.verify_token(req);
