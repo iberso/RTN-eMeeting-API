@@ -26,5 +26,20 @@ module.exports = {
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
+    },
+
+    async get_all_participants_by_meeting_id(id_meeting) {
+        let query = 'SELECT * FROM meeting_participant WHERE id_meeting = ?';
+        let values = [id_meeting];
+        try {
+            let data = await pool.query(query, values);
+            if (data.length != 0) {
+                return helper.http_response(data, 'success', null);
+            } else {
+                return helper.http_response(null, 'error', 'meeting not found', 404)
+            }
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
     }
 }
