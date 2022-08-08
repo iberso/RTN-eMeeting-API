@@ -27,18 +27,18 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
+
     async get_meeting_by_meeting_id(id_meeting) {
         let meeting_query = 'SELECT * FROM meeting WHERE id = ?';
         let meeting_query_values = [id_meeting];
         try {
             let meeting_detail = await pool.query(meeting_query, meeting_query_values);
             if (meeting_detail.length != 0) {
-                let participants_query = 'SELECT id_participant,participant_type,approve_notulensi,attendance FROM meeting_participant WHERE id_meeting = ? ORDER BY participant_type ASC;';
+                let participants_query = 'SELECT id_participant,participant_type,IF(approve_notulensi = 1,"true","false") AS approve_notulensi,IF(attendance = 1,"true","false") AS attendance FROM meeting_participant WHERE id_meeting = ? ORDER BY participant_type ASC';
                 let participants_query_values = [id_meeting];
                 let participants_data = await pool.query(participants_query, participants_query_values);
 
                 let meeting = {
-                    //how to get meeting detail
                     id: meeting_detail[0].id,
                     topic: meeting_detail[0].topic,
                     description: meeting_detail[0].description,
@@ -51,6 +51,7 @@ module.exports = {
                     type: meeting_detail[0].type,
                     notification_type: meeting_detail[0].notification_type,
                     participants: participants_data
+
                 }
 
                 return helper.http_response(meeting, 'success', null);
