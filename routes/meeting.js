@@ -102,37 +102,35 @@ module.exports = {
 
         try {
             await pool.query(meeting_query, meeting_values);
-            data = {
-                'id': meeting_values[0],
-                'topic': meeting_values[1],
-                'time_start': meeting_values[2],
-                'time_end': meeting_values[3],
-                'date': meeting_values[4],
-                'type': meeting_values[5],
-                'notification_type': meeting_values[6]
-            }
-            return helper.http_response(data, 'success', "meeting created successfully", 201);
+            //TODO : add all participants to meeting_participant table
+
+            return helper.http_response(null, 'success', "meeting created successfully", 201);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
     },
-    async get_all_users_by_meeting_status(nik, date, time_start, time_end) {
-        if (!nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
+
+    async get_all_users_by_meeting_status(nik_host, date, time_start, time_end) {
+        if (!nik_host) return helper.http_response(null, 'error', 'nik_host is not present in body', 400);
         if (!date) return helper.http_response(null, 'error', 'date is not present in body', 400);
         if (!time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
 
-        try {
-            let participants_query = 'SELECT mp.id_participant, u.email_address, mp.participant_type, IF(mp.approve_notulensi = 1,"true","false") AS approve_notulensi,IF(mp.attendance = 1,"true","false") AS attendance, IF(m.date = ? AND m.time_start = ? AND m.time_end = ?,"true","false") AS is_busy FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id JOIN user u ON u.nik = mp.id_participant WHERE mp.id_participant != ?';
-            let participants_query_values = [date, time_start, time_end, nik];
-            let participants_data = await pool.query(participants_query, participants_query_values);
+        let api_response = await this.get_user(user.nik);
+        if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
 
-            return helper.http_response(participants_data, 'success', null);
+        try {
+            let users_query = 'SELECT mp.id_participant, u.email_address, mp.participant_type, IF(mp.approve_notulensi = 1,"true","false") AS approve_notulensi,IF(mp.attendance = 1,"true","false") AS attendance, IF(m.date = ? AND m.time_start = ? AND m.time_end = ?,"true","false") AS is_busy FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id JOIN user u ON u.nik = mp.id_participant WHERE mp.id_participant != ?';
+            let users_query_values = [date, time_start, time_end, nik_host];
+            let users_data = await pool.query(users_query, users_query_values);
+
+            return helper.http_response(users_data, 'success', null);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
     },
-    async add_participant(id_meeting, participant) {
+
+    async add_participant(id_meeting, participants) {
         try {
 
         } catch (err) {
