@@ -160,5 +160,12 @@ module.exports = {
                 console.log("email send");
             }
         });
+    },
+    generate_values_placeholder(arr_key) {
+        let placeholder = [];
+        for (let idx = 0; idx < arr_key.length; idx++) {
+            placeholder.push('?');
+        }
+        return placeholder.join(',')
     }
 }

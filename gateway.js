@@ -8,6 +8,7 @@ const middleware = require('./middleware');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const uuid = require('uuid');
 
 const fs = require('fs');
 
@@ -72,7 +73,7 @@ app.put('/api/user', middleware.check_authorization, middleware.check_body, asyn
 
 // Meeting
 
-//ON-GOING
+//DONE
 app.get('/api/meeting/:meeting_id', async(req, res) => {
     let response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
     res.status(response.status_code).send(response.body);
@@ -89,7 +90,7 @@ app.get('/api/meeting/user/:nik/:date?', async(req, res) => {
     }
 });
 
-//For Basic Checking
+//For Basic Checkingf
 app.get('/api/check-token', async(req, res) => {
     let response = await helper.verify_token(req);
     res.status(response.status_code).send(response.body);
@@ -105,12 +106,3 @@ app.get('/api/token-extend', async(req, res) => {
     let response = await helper.extend_token(req);
     res.status(response.status_code).send(response.body);
 });
-
-//TODO LIST
-//NIK dan Email
-
-//TODO EDIT
-//Email
-
-//password random
-//add foto manual
