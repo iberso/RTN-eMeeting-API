@@ -116,13 +116,18 @@ module.exports = {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
     },
-    async get_participant_by_meeting_status(nik, date, time_start, time_end) {
+    async get_all_users_by_meeting_status(nik, date, time_start, time_end) {
+        if (!nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
+        if (!date) return helper.http_response(null, 'error', 'date is not present in body', 400);
+        if (!time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
+        if (!time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
+
         try {
             let participants_query = 'SELECT mp.id_participant, u.email_address, mp.participant_type, IF(mp.approve_notulensi = 1,"true","false") AS approve_notulensi,IF(mp.attendance = 1,"true","false") AS attendance, IF(m.date = ? AND m.time_start = ? AND m.time_end = ?,"true","false") AS is_busy FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id JOIN user u ON u.nik = mp.id_participant WHERE mp.id_participant != ?';
             let participants_query_values = [date, time_start, time_end, nik];
-
             let participants_data = await pool.query(participants_query, participants_query_values);
 
+            return helper.http_response(participants_data, 'success', null);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
@@ -135,6 +140,3 @@ module.exports = {
         }
     }
 }
-
-
-// SELECT mp.id_participant, u.email_address, mp.participant_type, IF(mp.approve_notulensi = 1,"true","false") AS approve_notulensi,IF(mp.attendance = 1,"true","false") AS attendance,IF(m.date = '')FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id JOIN user u ON u.nik = mp.id_participant WHERE mp.id_participant != 123456;
