@@ -62,7 +62,7 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async add_meeting(meeting) {
+    async add_meeting(meeting, nik) {
         if (!meeting.topic) return helper.http_response(null, 'error', 'meeting is not present in body', 400);
         if (!meeting.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!meeting.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
@@ -70,8 +70,9 @@ module.exports = {
         if (!meeting.type) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
         if (!meeting.notification_type) return helper.http_response(null, 'error', 'notification_type is not present in body', 400);
 
+        const uuid_meeting = uuid.v4();
         let meeting_query_key = ['id', 'topic', 'time_start', 'time_end', 'date', 'type', 'notification_type'];
-        let meeting_values = [uuid.v4(), meeting.topic, meeting.time_start, meeting.time_end, meeting.date, meeting.type, meeting.notification_type];
+        let meeting_values = [uuid_meeting, meeting.topic, meeting.time_start, meeting.time_end, meeting.date, meeting.type, meeting.notification_type];
         let meeting_values_placeholder = helper.generate_values_placeholder(meeting_query_key);
 
         if (meeting.type === 'Online') {
@@ -114,5 +115,26 @@ module.exports = {
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
+    },
+    async get_participant_by_meeting_status(nik, date, time_start, time_end) {
+        try {
+            let participants_query = 'SELECT mp.id_participant, u.email_address, mp.participant_type, IF(mp.approve_notulensi = 1,"true","false") AS approve_notulensi,IF(mp.attendance = 1,"true","false") AS attendance, IF(m.date = ? AND m.time_start = ? AND m.time_end = ?,"true","false") AS is_busy FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id JOIN user u ON u.nik = mp.id_participant WHERE mp.id_participant != ?';
+            let participants_query_values = [date, time_start, time_end, nik];
+
+            let participants_data = await pool.query(participants_query, participants_query_values);
+
+        } catch (err) {
+            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
+        }
+    },
+    async add_participant(id_meeting, participant) {
+        try {
+
+        } catch (err) {
+            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
+        }
     }
 }
+
+
+// SELECT mp.id_participant, u.email_address, mp.participant_type, IF(mp.approve_notulensi = 1,"true","false") AS approve_notulensi,IF(mp.attendance = 1,"true","false") AS attendance,IF(m.date = '')FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id JOIN user u ON u.nik = mp.id_participant WHERE mp.id_participant != 123456;
