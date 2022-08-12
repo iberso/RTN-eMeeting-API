@@ -78,17 +78,10 @@ app.get('/api/meeting/:meeting_id', async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
-
-//ON-GOING
-app.get('/api/meeting/user', async(req, res) => {
-    let response = await meeting.get_all_users_by_meeting_status(req);
-    res.status(response.status_code).send(response.body);
-});
-
 //DONE WITH REVISION
-app.get('/api/meeting/user/:nik/:date?', async(req, res) => {
-    if (req.params.date) {
-        let response = await meeting.get_user_meeting_by_date(req.params.nik, req.params.date);
+app.get('/api/meeting/user/:nik', async(req, res) => {
+    if (req.query.date) {
+        let response = await meeting.get_user_meeting_by_date(req.params.nik, req.query.date);
         res.status(response.status_code).send(response.body);
     } else {
         let response = await meeting.get_user_all_meeting(req.params.nik);
@@ -96,6 +89,11 @@ app.get('/api/meeting/user/:nik/:date?', async(req, res) => {
     }
 });
 
+//ON-GOING
+app.get('/api/meeting/user', async(req, res) => {
+    let response = await meeting.get_all_users_by_meeting_status(req);
+    res.status(response.status_code).send(response.body);
+});
 
 // Token Services
 
