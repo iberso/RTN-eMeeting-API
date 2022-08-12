@@ -110,18 +110,18 @@ module.exports = {
         }
     },
 
-    async get_all_users_by_meeting_status(nik_host, date, time_start, time_end) {
-        if (!nik_host) return helper.http_response(null, 'error', 'nik_host is not present in body', 400);
-        if (!date) return helper.http_response(null, 'error', 'date is not present in body', 400);
-        if (!time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
-        if (!time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
+    async get_all_users_by_meeting_status(status) {
+        if (!status.nik_host) return helper.http_response(null, 'error', 'nik_host is not present in body', 400);
+        if (!status.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
+        if (!status.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
+        if (!status.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
 
-        let api_response = await this.get_user(user.nik);
+        let api_response = await this.get_user(status.nik_host);
         if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
 
         try {
-            let users_query = 'SELECT mp.id_participant, u.email_address, mp.participant_type, IF(mp.approve_notulensi = 1,"true","false") AS approve_notulensi,IF(mp.attendance = 1,"true","false") AS attendance, IF(m.date = ? AND m.time_start = ? AND m.time_end = ?,"true","false") AS is_busy FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id JOIN user u ON u.nik = mp.id_participant WHERE mp.id_participant != ?';
-            let users_query_values = [date, time_start, time_end, nik_host];
+            let users_query = 'SELECT u.nik,u.email_address,IF((SELECT COUNT(*) FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id WHERE mp.id_participant != ? AND mp.id_participant = u.nik AND m.date = ? AND (m.time_start = ? OR m.time_end = ?)) = 0,"false","true") AS is_busy FROM user u'
+            let users_query_values = [status.nik_host, status.date, status.time_start, status.time_end];
             let users_data = await pool.query(users_query, users_query_values);
 
             return helper.http_response(users_data, 'success', null);

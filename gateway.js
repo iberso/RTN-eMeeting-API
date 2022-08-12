@@ -33,7 +33,7 @@ app.get('/api', async(req, res) => {
     res.status(200).send({ "Status": "success", "message": "Server, Halooooo" });
 })
 
-//User
+//User Services
 
 //DONE
 app.get('/api/user', middleware.check_authorization, async(req, res) => {
@@ -58,7 +58,6 @@ app.post('/api/user', middleware.check_body, async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
-
 //DONE
 app.post('/api/user/logout', middleware.check_authorization, async(req, res) => {
     let response = await user.logout_user(req);
@@ -71,13 +70,20 @@ app.put('/api/user', middleware.check_authorization, middleware.check_body, asyn
     res.status(response.status_code).send(response.body);
 })
 
-// Meeting
+// Meeting Services
 
 //DONE
 app.get('/api/meeting/:meeting_id', async(req, res) => {
     let response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
     res.status(response.status_code).send(response.body);
 })
+
+
+//ON-GOING
+app.get('/api/meeting/user', async(req, res) => {
+    let response = await meeting.get_all_users_by_meeting_status(req);
+    res.status(response.status_code).send(response.body);
+});
 
 //DONE WITH REVISION
 app.get('/api/meeting/user/:nik/:date?', async(req, res) => {
@@ -90,7 +96,10 @@ app.get('/api/meeting/user/:nik/:date?', async(req, res) => {
     }
 });
 
-//For Basic Checkingf
+
+// Token Services
+
+//For Basic Checking
 app.get('/api/check-token', async(req, res) => {
     let response = await helper.verify_token(req);
     res.status(response.status_code).send(response.body);
@@ -100,6 +109,7 @@ app.get('/api/check-token', async(req, res) => {
 app.get('/api/all-token', async(req, res) => {
     res.status(200).send(helper.get_all_tokens());
 })
+
 let counter = 0;
 app.get('/api/token-extend', async(req, res) => {
     console.log("Token Updated : " + counter++);
