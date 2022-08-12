@@ -78,7 +78,13 @@ app.get('/api/meeting/:meeting_id', async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
-//DONE WITH REVISION
+//ON-GOING
+app.post('/api/meeting', async(req, res) => {
+    let response = await meeting.add_meeting(req.body);
+    res.status(response.status_code).send(response.body);
+})
+
+//DONE
 app.get('/api/meeting/user/:nik', async(req, res) => {
     if (req.query.date) {
         let response = await meeting.get_user_meeting_by_date(req.params.nik, req.query.date);
@@ -89,14 +95,19 @@ app.get('/api/meeting/user/:nik', async(req, res) => {
     }
 });
 
-//ON-GOING
-app.get('/api/meeting/user', async(req, res) => {
-    let response = await meeting.get_all_users_by_meeting_status(req);
+//DONE
+app.post('/api/meeting/users', async(req, res) => {
+    let response = await meeting.get_all_users(req.body);
     res.status(response.status_code).send(response.body);
 });
 
-// Token Services
 
+//TODO : EDIT MEETING
+//TODO : EDIT PARTICIPANTS (remove and add) from meeting
+
+// Room Services
+
+// Token Services
 //For Basic Checking
 app.get('/api/check-token', async(req, res) => {
     let response = await helper.verify_token(req);

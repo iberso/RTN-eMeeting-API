@@ -1,4 +1,5 @@
 const helper = require("../helper");
+const user = require('./user');
 const pool = require('../database');
 const uuid = require('uuid');
 
@@ -62,8 +63,8 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async add_meeting(meeting, nik) {
-        if (!meeting.topic) return helper.http_response(null, 'error', 'meeting is not present in body', 400);
+    async add_meeting(meeting) {
+        if (!meeting.topic) return helper.http_response(null, 'error', 'topic is not present in body', 400);
         if (!meeting.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!meeting.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
         if (!meeting.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
@@ -73,7 +74,11 @@ module.exports = {
         const uuid_meeting = uuid.v4();
         let meeting_query_key = ['id', 'topic', 'time_start', 'time_end', 'date', 'type', 'notification_type'];
         let meeting_values = [uuid_meeting, meeting.topic, meeting.time_start, meeting.time_end, meeting.date, meeting.type, meeting.notification_type];
-        let meeting_values_placeholder = helper.generate_values_placeholder(meeting_query_key);
+
+        if (meeting.description) {
+            meeting_query_key.push('description');
+            meeting_values.push(meeting.description);
+        }
 
         if (meeting.type === 'Online') {
             if (!meeting.meeting_link) return helper.http_response(null, 'error', 'meeting_link is not present in body', 400);
@@ -95,28 +100,34 @@ module.exports = {
 
         let notif_type = ['Email', 'Push Notification'];
         if (!(notif_type.includes(meeting.notification_type))) {
-            return helper.http_response(null, 'error', 'notification_type is not valid, notification_type must be in ["Enail", "Push Notification"]', 400);
+            return helper.http_response(null, 'error', 'notification_type is not valid, notification_type must be in ["Email", "Push Notification"]', 400);
         }
 
-        let meeting_query = 'INSERT INTO meeting (' + meeting_query_key.join(',') + ') VALUES (' + meeting_values_placeholder + ')';
+        let meeting_query = 'INSERT INTO meeting (' + meeting_query_key.join(',') + ') VALUES (' + helper.generate_values_placeholder(meeting_query_key) + ')';
 
+        if (!meeting.participants) return helper.http_response(null, 'error', 'participants is not present in body', 400);
         try {
             await pool.query(meeting_query, meeting_values);
-            //TODO : add all participants to meeting_participant table
-
-            return helper.http_response(null, 'success', "meeting created successfully", 201);
+            try {
+                let query = 'INSERT INTO meeting_participant (id,id_meeting,id_participant,participant_type) VALUES ?';
+                let values = [meeting.participants.map(participant => [uuid.v4(), uuid_meeting, participant.nik, participant.type])];
+                await pool.query(query, values);
+                return helper.http_response(null, 'success', "meeting created successfully", 201);
+            } catch (err) {
+                return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
+            }
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
     },
 
-    async get_all_users_by_meeting_status(status) {
+    async get_all_users(status) {
         if (!status.nik_host) return helper.http_response(null, 'error', 'nik_host is not present in body', 400);
         if (!status.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
         if (!status.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!status.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
 
-        let api_response = await this.get_user(status.nik_host);
+        let api_response = await user.get_user(status.nik_host);
         if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
 
         try {
@@ -125,14 +136,6 @@ module.exports = {
             let users_data = await pool.query(users_query, users_query_values);
 
             return helper.http_response(users_data, 'success', null);
-        } catch (err) {
-            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
-        }
-    },
-
-    async add_participant(id_meeting, participants) {
-        try {
-
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
