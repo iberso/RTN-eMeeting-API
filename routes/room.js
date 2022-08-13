@@ -15,12 +15,25 @@ module.exports = {
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
-
     },
-    async add_room() {
-
+    async add_room(room) {
+        if (!room.room_name) return helper.http_response(null, 'error', 'room_name is not present in body', 400)
+        try {
+            await pool.query('INSERT INTO room (room_name) VALUES (?)', [room.room_name])
+            return helper.http_response(null, 'success created successfully', 201);
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
     },
-    async edit_room() {
+    async edit_room(room) {
+        if (!room.id) return helper.http_response(null, 'error', 'id is not present in body', 400)
+        if (!room.room_name) return helper.http_response(null, 'error', 'room_name is not present in body', 400)
 
+        try {
+            await pool.query('UPDATE room set room_name = ? WHERE id = ?', [room.room_name, room.id])
+            return helper.http_response(null, 'room updated successfully');
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
     }
 }
