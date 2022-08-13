@@ -76,13 +76,13 @@ app.put('/api/user', middleware.check_authorization, middleware.check_body, asyn
 app.get('/api/meeting/:meeting_id', async(req, res) => {
     let response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
     res.status(response.status_code).send(response.body);
-})
+});
 
-//ON-GOING
+//DONE
 app.post('/api/meeting', async(req, res) => {
     let response = await meeting.add_meeting(req.body);
     res.status(response.status_code).send(response.body);
-})
+});
 
 //DONE
 app.get('/api/meeting/user/:nik', async(req, res) => {
@@ -100,7 +100,6 @@ app.post('/api/meeting/users', async(req, res) => {
     let response = await meeting.get_all_users(req.body);
     res.status(response.status_code).send(response.body);
 });
-
 
 //TODO : EDIT MEETING
 //TODO : EDIT PARTICIPANTS (remove and add) from meeting
