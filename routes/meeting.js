@@ -71,6 +71,9 @@ module.exports = {
         if (!meeting.type) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
         if (!meeting.notification_type) return helper.http_response(null, 'error', 'notification_type is not present in body', 400);
 
+        if (!helper.is_time_format(meeting.time_start)) return helper.http_response(null, 'error', 'time_start is not in HH:mm format', 400);
+        if (!helper.is_time_format(meeting.time_end)) return helper.http_response(null, 'error', 'time_end is not in HH:mm format', 400);
+
         const uuid_meeting = uuid.v4();
         let meeting_query_key = ['id', 'topic', 'time_start', 'time_end', 'date', 'type', 'notification_type'];
         let meeting_values = [uuid_meeting, meeting.topic, meeting.time_start, meeting.time_end, meeting.date, meeting.type, meeting.notification_type];
@@ -131,8 +134,8 @@ module.exports = {
         if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
 
         try {
-            let users_query = 'SELECT u.nik,u.email_address,IF((SELECT COUNT(*) FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id WHERE mp.id_participant != ? AND mp.id_participant = u.nik AND m.date = ? AND (m.time_start = ? OR m.time_end = ?)) = 0,"false","true") AS is_busy FROM user u'
-            let users_query_values = [status.nik_host, status.date, status.time_start, status.time_end];
+            let users_query = 'SELECT u.nik,u.email_address,IF((SELECT COUNT(*) FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id WHERE m.date = ? AND (m.time_start = ? OR m.time_end = ?)) = 0,"false","true") AS is_busy FROM user u WHERE nik != ?';
+            let users_query_values = [status.date, status.time_start, status.time_end, status.nik_host];
             let users_data = await pool.query(users_query, users_query_values);
 
             return helper.http_response(users_data, 'success', null);
