@@ -2,7 +2,6 @@ const helper = require('../helper');
 const pool = require('../database');
 const jwt = require('jsonwebtoken');
 let util = require('util');
-const uuid = require('uuid');
 const bcrypt = require("bcrypt");
 const { urlencoded } = require('body-parser');
 require('dotenv').config();
@@ -10,7 +9,6 @@ require('dotenv').config();
 module.exports = {
 
     async get_user(nik = null, req = null) {
-
         let user_nik;
         if (nik) {
             user_nik = nik;
@@ -82,7 +80,6 @@ module.exports = {
         if (!user.password) return helper.http_response(null, 'error', 'password is not present in body', 400);
 
         let api_response = await this.get_user(user.nik);
-
         if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
 
         let sql = 'SELECT * FROM user WHERE nik = ?'

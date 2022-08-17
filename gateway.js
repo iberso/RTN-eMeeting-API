@@ -1,5 +1,7 @@
 const user = require('./routes/user');
 const meeting = require('./routes/meeting');
+const room = require('./routes/room');
+
 const express = require('express');
 const bodyParser = require('body-parser')
 const { json } = require("express");
@@ -79,6 +81,12 @@ app.get('/api/meeting/:meeting_id', async(req, res) => {
 });
 
 //DONE
+app.put('/api/meeting/:meeting_id', async(req, res) => {
+    let response = await meeting.edit_meeting(req.body, req.params.meeting_id);
+    res.status(response.status_code).send(response.body);
+});
+
+//DONE
 app.post('/api/meeting', async(req, res) => {
     let response = await meeting.add_meeting(req.body);
     res.status(response.status_code).send(response.body);
@@ -102,25 +110,48 @@ app.post('/api/meeting/users', async(req, res) => {
 });
 
 //TODO : EDIT MEETING
-//TODO : EDIT PARTICIPANTS (remove and add) from meeting
 
 // Room Services
 
+//DONE
+app.post('/api/room', async(req, res) => {
+    let response = await room.add_room(req.body);
+    res.status(response.status_code).send(response.body);
+});
+
+//DONE
+app.get('/api/room/:id_room', async(req, res) => {
+    let response = await room.get_room_by_id(req.params.id_room);
+    res.status(response.status_code).send(response.body);
+});
+
+//DONE
+app.put('/api/room/:id_room', async(req, res) => {
+    let response = await room.edit_room(req.body, req.params.id_room);
+    res.status(response.status_code).send(response.body);
+});
+
+//DONE
+app.post('/api/rooms', async(req, res) => {
+    let response = await room.get_all_room(req.body);
+    res.status(response.status_code).send(response.body);
+});
+
 // Token Services
-//For Basic Checking
+
+//DONE
 app.get('/api/check-token', async(req, res) => {
     let response = await helper.verify_token(req);
     res.status(response.status_code).send(response.body);
 })
 
-//For Basic Checking
+//DONE
 app.get('/api/all-token', async(req, res) => {
     res.status(200).send(helper.get_all_tokens());
 })
 
-let counter = 0;
+//DONE
 app.get('/api/token-extend', async(req, res) => {
-    console.log("Token Updated : " + counter++);
     let response = await helper.extend_token(req);
     res.status(response.status_code).send(response.body);
 });
