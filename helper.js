@@ -74,36 +74,15 @@ module.exports = {
     },
 
     add_token(client_token) {
-        // let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        // console.log(list_token.tokens)
-        // list_token.tokens.push(client_token)
-
-        // console.log(list_token.tokens.length)
-        // fs.writeFile('./files/token.json', JSON.stringify(list_token), (err) => {
-        //     if (err) console.log('Error writing file:', err)
-        // })
         tokens.push(client_token);
     },
 
     remove_token(client_token) {
-        // let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        // let remaining_token = list_token.tokens.filter(data => data != client_token);
-        // fs.writeFile('./files/token.json', JSON.stringify({ "tokens": remaining_token }), (err) => {
-        //     if (err) console.log('Error writing file:', err)
-        // })
         let new_list_tokens = tokens.filter(data => data != client_token);
         tokens = new_list_tokens;
     },
 
     check_token(client_token) {
-        // let list_token = JSON.parse(fs.readFileSync('./files/token.json'));
-        // let flag = false
-        // for (let index = 0; index < list_token.tokens.length; index++) {
-        //     if (list_token.tokens[index] === client_token) {
-        //         return flag = true;
-        //     }
-        // }
-        // return flag;
         let flag = false
         for (let index = 0; index < tokens.length; index++) {
             if (tokens[index] === client_token) {
@@ -125,7 +104,7 @@ module.exports = {
         }
     },
 
-    send_mail(user_email, subject, default_password, email_address, text = null) {
+    send_mail(user_email, subject, default_password, email_address) {
         const template = fs.readFileSync('./template/index.html', 'utf8');
 
         let transporter = nodemailer.createTransport({
@@ -161,6 +140,43 @@ module.exports = {
             }
         });
     },
+    send_mail_req_change_password(user_email, subject, email_address) {
+        const template = fs.readFileSync('./template/index.html', 'utf8');
+
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_ADDRESS,
+                pass: process.env.EMAIL_APP_KEY
+            }
+        });
+
+        let mailOption = {
+            from: {
+                name: 'Rutan E-Meeting Mailer',
+                address: process.env.EMAIL_ADDRESS
+            },
+            // from: process.env.EMAIL_ADDRESS,
+            to: user_email,
+            subject: subject,
+            text: "this email is sending your request to change password",
+            html: mustache.render(template, { default_password, email_address }),
+            attachments: [{
+                filename: 'logo_rutan.png',
+                path: './assets/images/logo_rutan.png',
+                cid: 'logo_rutan'
+            }]
+        }
+
+        // transporter.sendMail(mailOption, function(err, data) {
+        //     if (err) {
+        //         console.log(err);
+        //     } else {
+        //         console.log("email send");
+        //     }
+        // });
+        return transporter.sendMail(mailOption);
+    },
     generate_values_placeholder(arr_key) {
         let placeholder = [];
         for (let idx = 0; idx < arr_key.length; idx++) {
@@ -173,8 +189,4 @@ module.exports = {
         return regex.test(time);
     },
 
-    // is_date_format(date) {
-    //     let regex = /^\d{4}-\d{2}-\d{2}$/;
-    //     return regex.test(date);
-    // }
 }

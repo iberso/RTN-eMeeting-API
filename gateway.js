@@ -70,6 +70,18 @@ app.post('/api/user/logout', middleware.check_authorization, async(req, res) => 
 app.put('/api/user', middleware.check_authorization, async(req, res) => {
     let response = await user.edit_user(req);
     res.status(response.status_code).send(response.body);
+});
+
+//DONE
+app.put('/api/user/change-password', async(req, res) => {
+    let response = await user.change_password(req.body);
+    res.status(response.status_code).send(response.body);
+})
+
+//DONE
+app.post('/api/user/change-password', async(req, res) => {
+    let response = await user.req_change_password(req.body);
+    res.status(response.status_code).send(response.body);
 })
 
 // Meeting Services
@@ -155,5 +167,3 @@ app.get('/api/token-extend', async(req, res) => {
     let response = await helper.extend_token(req);
     res.status(response.status_code).send(response.body);
 });
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjA4MDQyMTMsImRhdGEiOnsibmlrIjoxMjM0NTYsImVtYWlsX2FkZHJlc3MiOiJpeG5ndHJya3R0ZWZrdHNmcnVAbnRocncuY29tIiwiZGV2aWNlX3Rva2VuIjpudWxsfSwiaWF0IjoxNjYwODA0MTkzfQ.Nrx2WgSfhHEDwLO4UR9_bJjWKOr_UnRwiq3NAdscnSg

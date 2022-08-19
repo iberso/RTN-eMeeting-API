@@ -65,10 +65,10 @@ module.exports = {
         try {
             await pool.query(sql, value);
             data = {
-                    'nik': user.nik,
-                    'email_address': user.email_address,
-                }
-                // helper.send_mail(user.email_address, "Your account has been registered", default_password, user.email_address);
+                'nik': user.nik,
+                'email_address': user.email_address,
+            }
+            helper.send_mail(user.email_address, "Your account has been registered", default_password, user.email_address);
             return helper.http_response(data, 'success', "account created successfully", 201);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
@@ -163,7 +163,7 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async reset_password(user) {
+    async change_password(user) {
         if (!user.new_password) return helper.http_response(null, 'error', 'new password is not present in body', 400);
         if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
 
@@ -181,6 +181,23 @@ module.exports = {
             return helper.http_response(null, 'success', "Password updated successfully");
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    },
+    async req_change_password(user) {
+        if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
+
+        let api_response = await this.get_user(user.nik);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
+        let sql = 'SELECT email_address FROM user WHERE nik = ?'
+        let value = [user.nik]
+
+        try {
+            let data = await pool.query(sql, value);
+
+            return helper.http_response(null, 'success', "Successfully logged in", 200, token);
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
         }
     }
 };
