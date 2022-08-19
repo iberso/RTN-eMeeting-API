@@ -163,4 +163,24 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
+    async reset_password(user) {
+        if (!user.new_password) return helper.http_response(null, 'error', 'new password is not present in body', 400);
+        if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
+
+        let api_response = await this.get_user(user.nik);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
+        try {
+            const hash_password = await bcrypt.hash(user.new_password, 10);
+            let sql = 'UPDATE user SET password = ? WHERE nik = ?';
+            let value = [
+                hash_password,
+                user.nik
+            ];
+            await pool.query(sql, value);
+            return helper.http_response(null, 'success', "Password updated successfully");
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    }
 };
