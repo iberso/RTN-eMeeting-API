@@ -163,8 +163,10 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async change_password(token) {
+    async change_password(token, data) {
         if (!token) return helper.http_response(null, 'error', 'token is not present', 400);
+        if (!data.new_password) return helper.http_response(null, 'error', 'new_password is not present', 400);
+
         try {
             let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
 
@@ -172,7 +174,7 @@ module.exports = {
             if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
 
             try {
-                const hash_password = await bcrypt.hash(result.data.new_password, 10);
+                const hash_password = await bcrypt.hash(data.new_password.toString(), 10);
                 let sql = 'UPDATE user SET password = ? WHERE nik = ?';
                 let value = [
                     hash_password,
@@ -186,9 +188,9 @@ module.exports = {
             }
         } catch (err) {
             if (err.message === 'jwt expired') {
-                return this.http_response(null, 'error', 'token expired', 401);
+                return helper.http_response(null, 'error', 'token expired', 401);
             } else {
-                return this.http_response(null, 'error', 'invalid token', 401)
+                return helper.http_response(null, 'error', 'invalid token', 401)
             }
         }
     },
@@ -203,12 +205,16 @@ module.exports = {
 
         try {
             let data = await pool.query(sql, value);
-            try {
-                await helper.send_mail_req_change_password(data[0].email_address, user.nik);
-                return helper.http_response(null, 'success', "Email sent successfully, passsword reset link sent to your email account");
-            } catch (err) {
-                return helper.http_response(null, 'error', "Mailer error occurredd: " + err, 500)
-            }
+
+            const token = await jwt.sign({
+                exp: Math.floor(Date.now() / 1000) + 300,
+                data: { "nik": user.nik }
+            }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+
+            helper.send_mail_req_change_password(data[0].email_address, token);
+
+            return helper.http_response(null, 'success', "Email sent successfully, passsword reset link sent to your email account");
+
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
         }

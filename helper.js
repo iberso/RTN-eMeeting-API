@@ -140,8 +140,8 @@ module.exports = {
             }
         });
     },
-    send_mail_req_change_password(user_email, subject, email_address) {
-        const template = fs.readFileSync('./template/index.html', 'utf8');
+    send_mail_req_change_password(user_email, token) {
+        const template = fs.readFileSync('./template/mailer/request-change-password.html', 'utf8');
 
         let transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -151,16 +151,17 @@ module.exports = {
             }
         });
 
+        let link_reset_password = token;
+
         let mailOption = {
             from: {
                 name: 'Rutan E-Meeting Mailer',
                 address: process.env.EMAIL_ADDRESS
             },
-            // from: process.env.EMAIL_ADDRESS,
             to: user_email,
-            subject: subject,
+            subject: "Reset Your Password",
             text: "this email is sending your request to change password",
-            html: mustache.render(template, { default_password, email_address }),
+            html: mustache.render(template, { link_reset_password }),
             attachments: [{
                 filename: 'logo_rutan.png',
                 path: './assets/images/logo_rutan.png',
@@ -168,14 +169,14 @@ module.exports = {
             }]
         }
 
-        // transporter.sendMail(mailOption, function(err, data) {
-        //     if (err) {
-        //         console.log(err);
-        //     } else {
-        //         console.log("email send");
-        //     }
-        // });
-        return transporter.sendMail(mailOption);
+        transporter.sendMail(mailOption, function(err, data) {
+            if (err) {
+                console.log(err);
+                return false;
+            } else {
+                return true;
+            }
+        });
     },
     generate_values_placeholder(arr_key) {
         let placeholder = [];

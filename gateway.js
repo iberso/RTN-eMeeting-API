@@ -74,7 +74,7 @@ app.put('/api/user', middleware.check_authorization, async(req, res) => {
 
 //DONE
 app.put('/api/user/reset-password/:token', async(req, res) => {
-    let response = await user.change_password(req.params.token);
+    let response = await user.change_password(req.params.token, req.body);
     res.status(response.status_code).send(response.body);
 })
 
@@ -167,3 +167,5 @@ app.get('/api/token-extend', async(req, res) => {
     let response = await helper.extend_token(req);
     res.status(response.status_code).send(response.body);
 });
+
+//TEMP HTML PAGE FOR RESET PASSWORD
