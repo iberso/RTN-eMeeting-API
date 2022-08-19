@@ -40,13 +40,4 @@ module.exports = {
             next();
         }
     },
-
-    check_body(req, res, next) {
-        if (!Object.keys(req.body).length) {
-            res.status(400).send({ "status": "Error", "message": "Body is missing" });
-            return;
-        } else {
-            next();
-        }
-    }
 }

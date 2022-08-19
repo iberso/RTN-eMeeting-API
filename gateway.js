@@ -49,13 +49,13 @@ app.get('/api/users', middleware.check_authorization, async(req, res) => {
 })
 
 //DONE
-app.post('/api/user/login', middleware.check_body, middleware.check_login, async(req, res) => {
+app.post('/api/user/login', middleware.check_login, async(req, res) => {
     let response = await user.login_user(req.body);
     res.status(response.status_code).send(response.body)
 })
 
 //DONE
-app.post('/api/user', middleware.check_body, async(req, res) => {
+app.post('/api/user', async(req, res) => {
     let response = await user.add_user(req.body);
     res.status(response.status_code).send(response.body);
 })
@@ -67,7 +67,7 @@ app.post('/api/user/logout', middleware.check_authorization, async(req, res) => 
 })
 
 //DONE
-app.put('/api/user', middleware.check_authorization, middleware.check_body, async(req, res) => {
+app.put('/api/user', middleware.check_authorization, async(req, res) => {
     let response = await user.edit_user(req);
     res.status(response.status_code).send(response.body);
 })
@@ -75,25 +75,25 @@ app.put('/api/user', middleware.check_authorization, middleware.check_body, asyn
 // Meeting Services
 
 //DONE
-app.get('/api/meeting/:meeting_id', async(req, res) => {
+app.get('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
     let response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
     res.status(response.status_code).send(response.body);
 });
 
 //DONE
-app.put('/api/meeting/:meeting_id', async(req, res) => {
+app.put('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
     let response = await meeting.edit_meeting(req.body, req.params.meeting_id);
     res.status(response.status_code).send(response.body);
 });
 
 //DONE
-app.post('/api/meeting', async(req, res) => {
+app.post('/api/meeting', middleware.check_authorization, async(req, res) => {
     let response = await meeting.add_meeting(req.body);
     res.status(response.status_code).send(response.body);
 });
 
 //DONE
-app.get('/api/meeting/user/:nik', async(req, res) => {
+app.get('/api/meeting/user/:nik', middleware.check_authorization, async(req, res) => {
     if (req.query.date) {
         let response = await meeting.get_user_meeting_by_date(req.params.nik, req.query.date);
         res.status(response.status_code).send(response.body);
@@ -104,7 +104,7 @@ app.get('/api/meeting/user/:nik', async(req, res) => {
 });
 
 //DONE
-app.post('/api/meeting/users', async(req, res) => {
+app.post('/api/meeting/users', middleware.check_authorization, async(req, res) => {
     let response = await meeting.get_all_users(req.body);
     res.status(response.status_code).send(response.body);
 });
@@ -114,25 +114,25 @@ app.post('/api/meeting/users', async(req, res) => {
 // Room Services
 
 //DONE
-app.post('/api/room', async(req, res) => {
+app.post('/api/room', middleware.check_authorization, async(req, res) => {
     let response = await room.add_room(req.body);
     res.status(response.status_code).send(response.body);
 });
 
 //DONE
-app.get('/api/room/:id_room', async(req, res) => {
+app.get('/api/room/:id_room', middleware.check_authorization, async(req, res) => {
     let response = await room.get_room_by_id(req.params.id_room);
     res.status(response.status_code).send(response.body);
 });
 
 //DONE
-app.put('/api/room/:id_room', async(req, res) => {
+app.put('/api/room/:id_room', middleware.check_authorization, async(req, res) => {
     let response = await room.edit_room(req.body, req.params.id_room);
     res.status(response.status_code).send(response.body);
 });
 
 //DONE
-app.post('/api/rooms', async(req, res) => {
+app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
     let response = await room.get_all_room(req.body);
     res.status(response.status_code).send(response.body);
 });
@@ -140,7 +140,7 @@ app.post('/api/rooms', async(req, res) => {
 // Token Services
 
 //DONE
-app.get('/api/check-token', async(req, res) => {
+app.get('/api/check-token', middleware.check_authorization, async(req, res) => {
     let response = await helper.verify_token(req);
     res.status(response.status_code).send(response.body);
 })
@@ -155,3 +155,5 @@ app.get('/api/token-extend', async(req, res) => {
     let response = await helper.extend_token(req);
     res.status(response.status_code).send(response.body);
 });
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjA4MDQyMTMsImRhdGEiOnsibmlrIjoxMjM0NTYsImVtYWlsX2FkZHJlc3MiOiJpeG5ndHJya3R0ZWZrdHNmcnVAbnRocncuY29tIiwiZGV2aWNlX3Rva2VuIjpudWxsfSwiaWF0IjoxNjYwODA0MTkzfQ.Nrx2WgSfhHEDwLO4UR9_bJjWKOr_UnRwiq3NAdscnSg

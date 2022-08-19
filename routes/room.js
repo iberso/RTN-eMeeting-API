@@ -54,7 +54,3 @@ module.exports = {
         }
     }
 }
-
-// SELECT r.id, r.room_name,IF((SELECT COUNT(*) FROM meeting WHERE id_room = r.id AND date ='2022-08-08' AND time_start = '11:00' AND time_end = '11:00') = 0,"false","true") AS is_avaliable FROM room r;
-// SELECT r.id, r.room_name,IF((SELECT COUNT(*) FROM meeting WHERE id_room = r.id AND date ='2022-08-08' AND time_start <= '15:00:00' AND time_end > '10:00:00') = 0,"false","true") AS is_avaliable FROM room r;
-// SELECT r.id, r.room_name,IF((SELECT COUNT(*) FROM meeting WHERE id_room = r.id AND date ='2022-08-08' AND time_start < '12:00:00' AND time_end > '10:00:00') = 0,"false","true") AS is_avaliable FROM room r;
