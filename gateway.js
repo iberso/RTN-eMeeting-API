@@ -73,13 +73,13 @@ app.put('/api/user', middleware.check_authorization, async(req, res) => {
 });
 
 //DONE
-app.put('/api/user/change-password', async(req, res) => {
-    let response = await user.change_password(req.body);
+app.put('/api/user/reset-password/:token', async(req, res) => {
+    let response = await user.change_password(req.params.token);
     res.status(response.status_code).send(response.body);
 })
 
 //DONE
-app.post('/api/user/change-password', async(req, res) => {
+app.post('/api/user/request-change-password', async(req, res) => {
     let response = await user.req_change_password(req.body);
     res.status(response.status_code).send(response.body);
 })

@@ -163,25 +163,36 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async change_password(user) {
-        if (!user.new_password) return helper.http_response(null, 'error', 'new password is not present in body', 400);
-        if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
-
-        let api_response = await this.get_user(user.nik);
-        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
-
+    async change_password(token) {
+        if (!token) return helper.http_response(null, 'error', 'token is not present', 400);
         try {
-            const hash_password = await bcrypt.hash(user.new_password, 10);
-            let sql = 'UPDATE user SET password = ? WHERE nik = ?';
-            let value = [
-                hash_password,
-                user.nik
-            ];
-            await pool.query(sql, value);
-            return helper.http_response(null, 'success', "Password updated successfully");
+            let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+            let api_response = await this.get_user(result.data.nik);
+            if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
+            try {
+                const hash_password = await bcrypt.hash(result.data.new_password, 10);
+                let sql = 'UPDATE user SET password = ? WHERE nik = ?';
+                let value = [
+                    hash_password,
+                    result.data.nik
+                ];
+                await pool.query(sql, value);
+
+                return helper.http_response(null, 'success', "Password updated successfully");
+            } catch (err) {
+                return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+            }
         } catch (err) {
-            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+            if (err.message === 'jwt expired') {
+                return this.http_response(null, 'error', 'token expired', 401);
+            } else {
+                return this.http_response(null, 'error', 'invalid token', 401)
+            }
         }
+
+
     },
     async req_change_password(user) {
         if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
@@ -195,7 +206,7 @@ module.exports = {
         try {
             let data = await pool.query(sql, value);
 
-            return helper.http_response(null, 'success', "Successfully logged in", 200, token);
+            return helper.http_response(null, 'success', "Password reset link sent to your email account", 200);
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
         }
