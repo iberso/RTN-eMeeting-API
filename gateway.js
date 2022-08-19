@@ -80,7 +80,7 @@ app.put('/api/user/reset-password/:token', async(req, res) => {
 
 //DONE
 app.post('/api/user/request-change-password', async(req, res) => {
-    let response = await user.req_change_password(req.body);
+    let response = await user.request_change_password(req.body);
     res.status(response.status_code).send(response.body);
 })
 

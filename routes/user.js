@@ -191,10 +191,8 @@ module.exports = {
                 return this.http_response(null, 'error', 'invalid token', 401)
             }
         }
-
-
     },
-    async req_change_password(user) {
+    async request_change_password(user) {
         if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
 
         let api_response = await this.get_user(user.nik);
@@ -205,8 +203,12 @@ module.exports = {
 
         try {
             let data = await pool.query(sql, value);
-
-            return helper.http_response(null, 'success', "Password reset link sent to your email account", 200);
+            try {
+                await helper.send_mail_req_change_password(data[0].email_address, user.nik);
+                return helper.http_response(null, 'success', "Email sent successfully, passsword reset link sent to your email account");
+            } catch (err) {
+                return helper.http_response(null, 'error', "Mailer error occurredd: " + err, 500)
+            }
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
         }
