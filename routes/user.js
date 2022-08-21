@@ -69,7 +69,7 @@ module.exports = {
                 'email_address': user.email_address,
             }
             helper.send_mail(user.email_address, "Your account has been registered", default_password, user.email_address);
-            return helper.http_response(data, 'success', "account created successfully", 201);
+            return helper.http_response(data, 'success', "Account created successfully!", 201);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
@@ -172,6 +172,15 @@ module.exports = {
 
             let api_response = await this.get_user(result.data.nik);
             if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
+            try {
+                let result = await pool.query('SELECT password FROM user WHERE nik = ?', [result.data.nik]);
+                if (await bcrypt.compare(data.new_password, result[0].password)) {
+                    return helper.http_response(null, 'error', 'New password cannot be the same as old password', 400);
+                }
+            } catch (err) {
+                return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+            }
 
             try {
                 const hash_password = await bcrypt.hash(data.new_password.toString(), 10);

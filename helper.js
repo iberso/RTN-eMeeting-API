@@ -12,6 +12,18 @@ require('dotenv').config();
 
 let tokens = [];
 module.exports = {
+    async check_reset_password_token(token) {
+        try {
+            await jwt.verify(token, process.env.JWT_SECRET_KEY);
+            return this.http_response(null, 'success', 'token valid', 200)
+        } catch (err) {
+            if (err.message === 'jwt expired') {
+                return this.http_response(null, 'error', 'token expired', 401);
+            } else {
+                return this.http_response(null, 'error', 'invalid token', 401)
+            }
+        }
+    },
     async verify_token(req) {
         let token = this.get_token_from_headers(req);
         try {
