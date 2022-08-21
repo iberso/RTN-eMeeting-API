@@ -1,10 +1,6 @@
-let util = require('util');
 const bcrypt = require("bcrypt");
-const { resolve } = require('path');
-const { rejects } = require('assert');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const { json } = require('body-parser');
 const nodemailer = require('nodemailer');
 const mustache = require('mustache');
 
