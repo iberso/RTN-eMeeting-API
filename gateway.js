@@ -170,5 +170,5 @@ app.get('/api/token-extend', async(req, res) => {
 
 app.get('/api/reset-password-check/:token', async(req, res) => {
     let response = await helper.check_reset_password_token(req.params.token);
-    res.status(response.status_code).send(response.body);
+    res.status(response.status_code).send(response.body).con;
 });

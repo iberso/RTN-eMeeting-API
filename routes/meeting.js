@@ -1,10 +1,17 @@
 const helper = require("../helper");
 const user = require('./user');
+const room = require('./room');
 const pool = require('../database');
 const uuid = require('uuid');
 
 module.exports = {
     async get_user_meeting_by_date(nik, selected_date) {
+        if (!nik) return helper.http_response(null, 'error', 'nik is not present', 400);
+        if (!selected_date) return helper.http_response(null, 'error', 'selected_date is not present', 400);
+
+        let api_response = await user.get_user(nik);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
         try {
             let data = await pool.query('SELECT m.id,m.topic,m.description,m.hasil_meeting,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type, (SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id ) AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? AND m.date = ?', [nik, selected_date]);
             if (data.length != 0) {
@@ -17,8 +24,14 @@ module.exports = {
         }
     },
     async get_user_all_meeting(nik) {
+        if (!nik) return helper.http_response(null, 'error', 'nik is not present', 400);
+
+        let api_response = await user.get_user(nik);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
         try {
             let data = await pool.query('SELECT m.id,m.topic,m.description,m.hasil_meeting,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type, (SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id ) AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ?', [nik]);
+
             if (data.length != 0) {
                 return helper.http_response(data, 'success', null);
             } else {
@@ -29,7 +42,9 @@ module.exports = {
         }
     },
     async get_meeting_by_meeting_id(id_meeting) {
-        let meeting_query = 'SELECT * FROM meeting WHERE id = ?';
+        if (!id_meeting) return helper.http_response(null, 'error', 'id_meeting is not present', 400);
+
+        let meeting_query = 'SELECT id,topic,description,hasil_meeting,DATE_FORMAT(time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,date,id_room,meeting_link,type,notification_type FROM meeting WHERE id = ?';
         let meeting_query_values = [id_meeting];
 
         try {
@@ -39,6 +54,9 @@ module.exports = {
                 let participants_query_values = [id_meeting];
                 let participants_data = await pool.query(participants_query, participants_query_values);
 
+                let api_response = await room.get_room_by_id(meeting_detail[0].id_room);
+                if (api_response.status_code === 404) return helper.http_response(null, 'error', 'Room not found', 404);
+
                 let meeting = {
                     id: meeting_detail[0].id,
                     topic: meeting_detail[0].topic,
@@ -47,7 +65,7 @@ module.exports = {
                     time_start: meeting_detail[0].time_start,
                     time_end: meeting_detail[0].time_end,
                     date: meeting_detail[0].date,
-                    id_room: meeting_detail[0].id_room,
+                    room: api_response.body.data,
                     meeting_link: meeting_detail[0].meeting_link,
                     type: meeting_detail[0].type,
                     notification_type: meeting_detail[0].notification_type,
@@ -198,6 +216,9 @@ module.exports = {
         if (!status.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
         if (!status.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!status.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
+
+        if (!helper.is_time_format(status.time_start)) return helper.http_response(null, 'error', 'time_start is not in HH:mm format', 400);
+        if (!helper.is_time_format(status.time_end)) return helper.http_response(null, 'error', 'time_end is not in HH:mm format', 400);
 
         let api_response = await user.get_user(status.nik_host);
         if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
