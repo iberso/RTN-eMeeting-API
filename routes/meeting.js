@@ -54,8 +54,16 @@ module.exports = {
                 let participants_query_values = [id_meeting];
                 let participants_data = await pool.query(participants_query, participants_query_values);
 
-                let api_response = await room.get_room_by_id(meeting_detail[0].id_room);
-                if (api_response.status_code === 404) return helper.http_response(null, 'error', 'Room not found', 404);
+                let api_response = {
+                    'body': {
+                        'data': null
+                    }
+                }
+
+                if (meeting_detail[0].type != 'Online') {
+                    api_response = await room.get_room_by_id(meeting_detail[0].id_room);
+                    if (api_response.status_code === 404) return helper.http_response(null, 'error', 'Room not found', 404);
+                }
 
                 let meeting = {
                     id: meeting_detail[0].id,
@@ -76,6 +84,7 @@ module.exports = {
                 return helper.http_response(null, 'error', 'meeting not found', 404)
             }
         } catch (err) {
+            console.log(err)
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },

@@ -867,3 +867,9 @@
 }
 ```
 *) `time_start` and `time_end` must be in HH:mm format
+
+
+# TODO
+
+error checking
+- when get meeting by id (type onsite) if room == null then error because room not found
