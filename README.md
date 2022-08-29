@@ -1,6 +1,5 @@
 # Headers
 
-## Request Headers
 ```json
 {
    "Content-Type": "application/json",

@@ -26,6 +26,7 @@ module.exports = {
             let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
             return this.http_response(result.data, 'success', 'token valid', 200)
         } catch (err) {
+            console.log(err);
             if (this.check_token(token)) {
                 this.remove_token(token);
             }
