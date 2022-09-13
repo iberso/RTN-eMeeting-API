@@ -711,6 +711,57 @@
 }
 ```
 
+## Request: Edit meeting by meeting id
+![PUT](https://badgen.net/badge/Method/PUT/blue)<span style="margin-left:12px; font-size:12pt;">**/api/meeting/`<string:id_meeting>`**</span>
+### Headers :
+```json
+{
+   "Content-Type": "application/json",
+   "Authorization": "Bearer <String:jwt token>"
+}
+```
+
+### Body :
+```json
+{
+    "topic": "Lorem Ipsum",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce eu porttitor eros. Pellentesque at imperdiet augue. Curabitur diam est, convallis vel quam tempor, feugiat sagittis velit.",
+    "hasil_meeting": null,
+    "time_start": "09:00",
+    "time_end": "11:00",
+    "date": "2022-08-19",
+    "id_room": 1,
+    "meeting_link": "meet.google.com/xxx-xxxx-xxx",
+    "type": "Hybird",
+    "notification_type": "Email",
+    "participants": [
+        {
+            "nik": 123450,
+            "type": "Host"
+        },
+        {
+            "nik": 123451,
+            "type": "Notulis"
+        },
+        {
+            "nik": 123455,
+            "type": "Participant",
+        },
+       ...
+    ]
+}
+```
+
+### Responses:
+#### Request: add meeting
+![OK](https://badgen.net/badge/OK/200/green)
+```json
+{
+    "status": "success",
+    "message": "meeting updated successfully"
+}
+```
+
 # Room
 
 ## Request: add room
