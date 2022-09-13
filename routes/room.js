@@ -3,14 +3,14 @@ const pool = require('../database');
 
 module.exports = {
     async get_all_room(status) {
-        if (!status.id) return helper.http_response(null, 'error', 'current id meeting is not present in body', 400);
+        if (!status.current_meeting_id) return helper.http_response(null, 'error', 'current meeting id is not present in body', 400);
         if (!status.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
         if (!status.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!status.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
 
         try {
             let rooms_query = 'SELECT r.id, r.room_name,IF((SELECT COUNT(*) FROM meeting WHERE id != ? AND id_room = r.id AND date = ? AND time_start < ? AND time_end > ?) = 0,"true","false") AS is_available FROM room r ORDER BY is_available ASC';
-            let rooms_query_values = [status.id, status.date, status.time_end, status.time_start];
+            let rooms_query_values = [status.current_meeting_id, status.date, status.time_end, status.time_start];
             let rooms_data = await pool.query(rooms_query, rooms_query_values);
 
             return helper.http_response(rooms_data, 'success', null);
