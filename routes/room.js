@@ -8,7 +8,7 @@ module.exports = {
         if (!status.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
 
         try {
-            let rooms_query = 'SELECT r.id, r.room_name,IF((SELECT COUNT(*) FROM meeting WHERE id_room = r.id AND date = ? AND time_start < ? AND time_end > ?) = 0,"true","false") AS is_available FROM room r';
+            let rooms_query = 'SELECT r.id, r.room_name,IF((SELECT COUNT(*) FROM meeting WHERE id_room = r.id AND date = ? AND time_start < ? AND time_end > ?) = 0,"true","false") AS is_available FROM room r ORDER BY is_available ASC';
             let rooms_query_values = [status.date, status.time_end, status.time_start];
             let rooms_data = await pool.query(rooms_query, rooms_query_values);
 

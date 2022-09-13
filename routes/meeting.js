@@ -149,16 +149,19 @@ module.exports = {
         }
     },
     async edit_meeting(meeting, id_meeting) {
+        console.log(meeting);
         if (!id_meeting) return helper.http_response(null, 'error', 'id_meeting is not present', 400);
         if (!meeting.topic) return helper.http_response(null, 'error', 'topic is not present in body', 400);
         if (!meeting.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!meeting.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
         if (!meeting.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
-        if (!meeting.type) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
+        if (!meeting.type) return helper.http_response(null, 'error', 'type is not present in body', 400);
         if (!meeting.notification_type) return helper.http_response(null, 'error', 'notification_type is not present in body', 400);
 
-        let api_response = await this.get_room_by_id(id_meeting);
-        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'meeting not found', 404);
+        if (meeting.type != 'Online') {
+            const api_response = await room.get_room_by_id(meeting.id_room);
+            if (api_response.status_code === 404) return helper.http_response(null, 'error', 'Room not found', 404);
+        }
 
         if (!helper.is_time_format(meeting.time_start)) return helper.http_response(null, 'error', 'time_start is not in HH:mm format', 400);
         if (!helper.is_time_format(meeting.time_end)) return helper.http_response(null, 'error', 'time_end is not in HH:mm format', 400);
@@ -167,7 +170,7 @@ module.exports = {
         let meeting_values = [meeting.topic, meeting.time_start, meeting.time_end, meeting.date, meeting.type, meeting.notification_type];
 
         if (meeting.description) {
-            meeting_query_key.push('description');
+            meeting_query_key.push('description = ?');
             meeting_values.push(meeting.description);
         }
 
@@ -196,6 +199,9 @@ module.exports = {
 
         let meeting_query = 'UPDATE meeting set ' + meeting_query_key.join(',') + ' WHERE id = ?';
         meeting_values.push(id_meeting);
+
+        console.log(meeting_query);
+        console.log(meeting_values);
 
         if (!meeting.participants) return helper.http_response(null, 'error', 'participants is not present in body', 400);
 

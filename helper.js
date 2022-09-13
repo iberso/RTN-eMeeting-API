@@ -149,6 +149,7 @@ module.exports = {
             }
         });
     },
+
     send_mail_req_change_password(user_email, token) {
         const template = fs.readFileSync('./template/mailer/request-change-password.html', 'utf8');
 
@@ -187,6 +188,7 @@ module.exports = {
             }
         });
     },
+
     generate_values_placeholder(arr_key) {
         let placeholder = [];
         for (let idx = 0; idx < arr_key.length; idx++) {
@@ -194,6 +196,7 @@ module.exports = {
         }
         return placeholder.join(',')
     },
+
     is_time_format(time) {
         let regex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
         return regex.test(time);
