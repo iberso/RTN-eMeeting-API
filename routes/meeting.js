@@ -192,7 +192,7 @@ module.exports = {
             return helper.http_response(null, 'error', 'meeting_type is not valid, meeting_type must be in ["Online","Onsite","Hybird"]', 400);
         }
 
-        let notif_type = ['Email', 'Push Notification'];
+        const notif_type = ['Email', 'Push Notification'];
         if (!(notif_type.includes(meeting.notification_type))) {
             return helper.http_response(null, 'error', 'notification_type is not valid, notification_type must be in ["Email", "Push Notification"]', 400);
         }

@@ -874,6 +874,7 @@
 ### Body :
 ```json
 {
+    "current_meeting_id" : "uuid of current meeting id",
     "date": "2022-08-08",
     "time_start": "09:00:00",
     "time_end": "15:00:00"
