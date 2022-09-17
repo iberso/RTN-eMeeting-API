@@ -10,7 +10,7 @@ let tokens = [];
 module.exports = {
     async check_reset_password_token(token) {
         try {
-            await jwt.verify(token, process.env.JWT_SECRET_KEY);
+            await jwt.verify(token, process.env['JWT_SECRET_KEY']);
             return this.http_response(null, 'success', 'token valid', 200)
         } catch (err) {
             if (err.message === 'jwt expired') {
@@ -23,7 +23,7 @@ module.exports = {
     async verify_token(req) {
         let token = this.get_token_from_headers(req);
         try {
-            let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+            let result = await jwt.verify(token, process.env['JWT_SECRET_KEY']);
             return this.http_response(result.data, 'success', 'token valid', 200)
         } catch (err) {
             console.log(err);
@@ -43,12 +43,12 @@ module.exports = {
         if (token) {
             let result = await this.verify_token(req);
             if (result.status_code === 401 && result.body.message === "token expired") {
-                let decoded = jwt.decode(token, process.env.JWT_SECRET_KEY);
+                let decoded = jwt.decode(token, process.env['JWT_SECRET_KEY']);
                 const new_token = await jwt.sign({
                     exp: Math.floor(Date.now() / 1000) +
-                        parseInt(process.env.JWT_EXP_TIME_IN_SECONDS),
+                        parseInt(process.env['JWT_EXP_TIME_IN_SECONDS']),
                     data: decoded.data
-                }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+                }, process.env['JWT_SECRET_KEY'], { algorithm: 'HS256' });
                 this.add_token(new_token);
                 return this.http_response(null, 'success', null, 200, new_token);
             } else {
@@ -119,15 +119,15 @@ module.exports = {
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.EMAIL_ADDRESS,
-                pass: process.env.EMAIL_APP_KEY
+                user: process.env['EMAIL_ADDRESS'],
+                pass: process.env['EMAIL_APP_KEY']
             }
         });
 
         let mailOption = {
             from: {
                 name: 'Rutan E-Meeting Mailer',
-                address: process.env.EMAIL_ADDRESS
+                address: process.env['EMAIL_ADDRESS']
             },
             // from: process.env.EMAIL_ADDRESS,
             to: user_email,
@@ -156,8 +156,8 @@ module.exports = {
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.EMAIL_ADDRESS,
-                pass: process.env.EMAIL_APP_KEY
+                user: process.env['EMAIL_ADDRESS'],
+                pass: process.env['EMAIL_APP_KEY']
             }
         });
 
@@ -166,7 +166,7 @@ module.exports = {
         let mailOption = {
             from: {
                 name: 'Rutan E-Meeting Mailer',
-                address: process.env.EMAIL_ADDRESS
+                address: process.env['EMAIL_ADDRESS']
             },
             to: user_email,
             subject: "Reset Your Password",

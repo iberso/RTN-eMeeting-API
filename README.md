@@ -925,3 +925,5 @@
 
 error checking
 - when get meeting by id (type onsite) if room == null then error because room not found
+- must check if body is empty in method POST
+- check if email has been use by another person

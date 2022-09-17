@@ -14,7 +14,7 @@ module.exports = {
             user_nik = nik;
         } else if (req) {
             let token = helper.get_token_from_headers(req);
-            let decoded_token = jwt.decode(token, process.env.JWT_SECRET_KEY);
+            let decoded_token = jwt.decode(token, process.env['JWT_SECRET_KEY']);
             user_nik = decoded_token.data.nik;
         }
         try {
@@ -50,8 +50,6 @@ module.exports = {
         if (api_response.status_code === 200) return helper.http_response(null, 'error', 'User already exist', 400);
 
         let default_password = Math.floor(100000 + Math.random() * 900000).toString();
-
-        console.log(user.nik + " " + default_password)
 
         const hash_password = await bcrypt.hash(default_password, 10);
 
@@ -95,9 +93,9 @@ module.exports = {
             if (result) {
                 const token = await jwt.sign({
                     exp: Math.floor(Date.now() / 1000) +
-                        parseInt(process.env.JWT_EXP_TIME_IN_SECONDS),
+                        parseInt(process.env['JWT_EXP_TIME_IN_SECONDS']),
                     data: res_data
-                }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+                }, process.env['JWT_SECRET_KEY'], { algorithm: 'HS256' });
                 helper.add_token(token)
                 return helper.http_response(null, 'success', "Successfully logged in", 200, token);
             } else {
@@ -168,7 +166,7 @@ module.exports = {
         if (!data.new_password) return helper.http_response(null, 'error', 'new_password is not present', 400);
 
         try {
-            let result = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+            let result = await jwt.verify(token, process.env['JWT_SECRET_KEY']);
 
             let api_response = await this.get_user(result.data.nik);
             if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
@@ -218,7 +216,7 @@ module.exports = {
             const token = await jwt.sign({
                 exp: Math.floor(Date.now() / 1000) + 300,
                 data: { "nik": user.nik }
-            }, process.env.JWT_SECRET_KEY, { algorithm: 'HS256' });
+            }, process.env['JWT_SECRET_KEY'], { algorithm: 'HS256' });
 
             helper.send_mail_req_change_password(data[0].email_address, token);
 

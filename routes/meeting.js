@@ -84,7 +84,6 @@ module.exports = {
                 return helper.http_response(null, 'error', 'meeting not found', 404)
             }
         } catch (err) {
-            console.log(err)
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
@@ -149,7 +148,6 @@ module.exports = {
         }
     },
     async edit_meeting(meeting, id_meeting) {
-        console.log(meeting);
         if (!id_meeting) return helper.http_response(null, 'error', 'id_meeting is not present', 400);
         if (!meeting.topic) return helper.http_response(null, 'error', 'topic is not present in body', 400);
         if (!meeting.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
@@ -200,9 +198,6 @@ module.exports = {
         let meeting_query = 'UPDATE meeting set ' + meeting_query_key.join(',') + ' WHERE id = ?';
         meeting_values.push(id_meeting);
 
-        console.log(meeting_query);
-        console.log(meeting_values);
-
         if (!meeting.participants) return helper.http_response(null, 'error', 'participants is not present in body', 400);
 
         try {
@@ -227,20 +222,14 @@ module.exports = {
         }
     },
     async get_all_users(status) {
-        if (!status.nik_host) return helper.http_response(null, 'error', 'nik_host is not present in body', 400);
+        if (!status.current_meeting_id) return helper.http_response(null, 'error', 'current meeting id is not present in body', 400);
         if (!status.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
         if (!status.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
         if (!status.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
 
-        // if (!helper.is_time_format(status.time_start)) return helper.http_response(null, 'error', 'time_start is not in HH:mm format', 400);
-        // if (!helper.is_time_format(status.time_end)) return helper.http_response(null, 'error', 'time_end is not in HH:mm format', 400);
-
-        let api_response = await user.get_user(status.nik_host);
-        if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
-
         try {
-            let users_query = 'SELECT u.nik,u.email_address,IF((SELECT COUNT(*) FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id WHERE mp.id_participant = u.nik AND m.date = ? AND (m.time_start < ? AND m.time_end > ?)) = 0,"false","true") AS is_busy FROM user u WHERE nik != ?';
-            let users_query_values = [status.date, status.time_end, status.time_start, status.nik_host];
+            let users_query = 'SELECT u.nik,u.email_address,IF((SELECT COUNT(*) FROM meeting_participant mp JOIN meeting m ON mp.id_meeting = m.id WHERE m.id != ? AND mp.id_participant = u.nik AND m.date = ? AND (m.time_start < ? AND m.time_end > ?)) = 0,"false","true") AS is_busy FROM user u';
+            let users_query_values = [status.current_meeting_id, status.date, status.time_end, status.time_start];
             let users_data = await pool.query(users_query, users_query_values);
 
             return helper.http_response(users_data, 'success', null);
