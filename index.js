@@ -1,6 +1,7 @@
 const user = require('./routes/user');
 const meeting = require('./routes/meeting');
 const room = require('./routes/room');
+const path = require("path");
 
 const express = require('express');
 const bodyParser = require('body-parser')
@@ -171,4 +172,9 @@ app.get('/api/token-extend', async(req, res) => {
 app.get('/api/reset-password-check/:token', async(req, res) => {
     let response = await helper.check_reset_password_token(req.params.token);
     res.status(response.status_code).send(response.body).con;
+});
+
+//IMAGES
+app.get("/api/images", (req, res) => {
+    res.sendFile(path.join(__dirname, "./assets/images/logo_rutan.png"));
 });
