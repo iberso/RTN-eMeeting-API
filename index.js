@@ -8,6 +8,9 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const ws = require('ws');
+
+const io = require('socket.io')(server);
+
 const wss = new ws.Server({ server });
 
 const bodyParser = require('body-parser')
@@ -173,13 +176,22 @@ app.get("/api/images", (req, res) => {
     res.sendFile(path.join(__dirname, "./assets/images/logo_rutan.png"));
 });
 
-wss.on('connection', function connection(ws) {
-    ws.on('message', function message(data) {
+wss.on('connection', (ws) => {
+    console.log(ws)
+    console.log('User ' + ws + ' Connected');
+    ws.on('message', (data) => {
         console.log('received: %s', data);
     });
 
-    ws.send('something');
 });
+
+// wss.on('connection', function connection(ws) {
+//     ws.on('message', function message(data) {
+//         console.log('received: %s', data);
+//     });
+
+//     ws.send('something');
+// });
 
 const portServer = process.env['PORT'];
 const portWebSocket = process.env['PORT_WS'];
