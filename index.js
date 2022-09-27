@@ -4,26 +4,20 @@ const room = require('./routes/room');
 const path = require("path");
 
 const express = require('express');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const ws = require('ws');
+const wss = new ws.Server({ server });
+
 const bodyParser = require('body-parser')
 const { json } = require("express");
 const helper = require('./helper');
 const middleware = require('./middleware');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const uuid = require('uuid');
-
-const fs = require('fs');
 
 require('dotenv').config();
-
-const app = express();
-
-const port = process.env['PORT'];
-
-app.listen(port, () => {
-    console.log(`REST API listening at ${port}`)
-});
 
 app.use(cors({
     origin: '*'
@@ -177,4 +171,23 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
 //IMAGES
 app.get("/api/images", (req, res) => {
     res.sendFile(path.join(__dirname, "./assets/images/logo_rutan.png"));
+});
+
+wss.on('connection', function connection(ws) {
+    ws.on('message', function message(data) {
+        console.log('received: %s', data);
+    });
+
+    ws.send('something');
+});
+
+const portServer = process.env['PORT'];
+const portWebSocket = process.env['PORT_WS'];
+
+app.listen(portServer, () => {
+    console.log(`REST API listening at ${portServer}`)
+});
+
+server.listen(portWebSocket, function() {
+    console.log(`WebSocket Service listening at ${portWebSocket}`)
 });
