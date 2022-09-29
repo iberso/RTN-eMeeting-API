@@ -3,15 +3,20 @@ const meeting = require('./routes/meeting');
 const room = require('./routes/room');
 const path = require("path");
 
+const portServer = process.env['PORT'];
+const portWebSocket = process.env['PORT_WS'];
+
 const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-const ws = require('ws');
-
-const io = require('socket.io')(server);
-
-const wss = new ws.Server({ server });
+// const ws = require('ws');
+// const wss = new ws.Server({ server });
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "*"
+    }
+});
 
 const bodyParser = require('body-parser')
 const { json } = require("express");
@@ -107,6 +112,9 @@ app.get('/api/meeting/user/:nik', middleware.check_authorization, async(req, res
     if (req.query.date) {
         let response = await meeting.get_user_meeting_by_date(req.params.nik, req.query.date);
         res.status(response.status_code).send(response.body);
+    } else if (req.query.type) {
+        let response = await meeting.get_user_all_meeting_by_type(nik, req.query.type);
+        res.status(response.status_code).send(response.body);
     } else {
         let response = await meeting.get_user_all_meeting(req.params.nik);
         res.status(response.status_code).send(response.body);
@@ -176,30 +184,35 @@ app.get("/api/images", (req, res) => {
     res.sendFile(path.join(__dirname, "./assets/images/logo_rutan.png"));
 });
 
-wss.on('connection', (ws) => {
-    console.log(ws)
-    console.log('User ' + ws + ' Connected');
-    ws.on('message', (data) => {
-        console.log('received: %s', data);
-    });
+// wss.on('connection', (ws) => {
+//     // console.log('User ' + ws + ' Connected');
+//     console.log('user connected');
 
-});
-
-// wss.on('connection', function connection(ws) {
-//     ws.on('message', function message(data) {
+//     ws.on('message', (data) => {
 //         console.log('received: %s', data);
 //     });
 
-//     ws.send('something');
 // });
+io.on("connection", function(socket) {
+    console.log("Users join " + socket.id);
+    socket.on('get-document', function(meeting_Id) {
+        let data = ""; //get document 
+        socket.join(meeting_Id)
+        socket.emit('load-document', data);
 
-const portServer = process.env['PORT'];
-const portWebSocket = process.env['PORT_WS'];
-
-app.listen(portServer, () => {
-    console.log(`REST API listening at ${portServer}`)
+        socket.on('send-changes', function(data) {
+            socket.broadcast.to(meeting_Id).emit('receive-changes', data);
+        });
+    });
 });
 
-server.listen(portWebSocket, function() {
-    console.log(`WebSocket Service listening at ${portWebSocket}`)
+// https://www.youtube.com/watch?v=jD7FnbI76Hg
+
+
+// app.listen(portServer, () => {
+//     console.log(`REST API listening at ${portServer}`)
+// });
+
+server.listen(portServer, function() {
+    console.log(`Rest API listening at ${portServer}`)
 });

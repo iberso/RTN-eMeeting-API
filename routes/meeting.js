@@ -41,6 +41,24 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
+    async get_user_all_meeting_by_type(nik, user_type) {
+        if (!nik) return helper.http_response(null, 'error', 'nik is not present', 400);
+
+        let api_response = await user.get_user(nik);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
+        try {
+            let data = await pool.query('SELECT m.id,m.topic,m.description,m.hasil_meeting,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type, (SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id ) AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? AND mp.participant_type = ?', [nik, user_type]);
+
+            if (data.length != 0) {
+                return helper.http_response(data, 'success', null);
+            } else {
+                return helper.http_response(null, 'error', 'meeting not found', 404)
+            }
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    },
     async get_meeting_by_meeting_id(id_meeting) {
         if (!id_meeting) return helper.http_response(null, 'error', 'id_meeting is not present', 400);
 
