@@ -113,7 +113,7 @@ app.get('/api/meeting/user/:nik', middleware.check_authorization, async(req, res
         let response = await meeting.get_user_meeting_by_date(req.params.nik, req.query.date);
         res.status(response.status_code).send(response.body);
     } else if (req.query.type) {
-        let response = await meeting.get_user_all_meeting_by_type(nik, req.query.type);
+        let response = await meeting.get_user_all_meeting_by_type(req.params.nik, req.query.type);
         res.status(response.status_code).send(response.body);
     } else {
         let response = await meeting.get_user_all_meeting(req.params.nik);
