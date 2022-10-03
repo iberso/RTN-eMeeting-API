@@ -10,8 +10,7 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-// const ws = require('ws');
-// const wss = new ws.Server({ server });
+
 const io = require('socket.io')(server, {
     cors: {
         origin: "*"
@@ -180,19 +179,11 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
 });
 
 //IMAGES
-app.get("/api/images", (req, res) => {
-    res.sendFile(path.join(__dirname, "./assets/images/logo_rutan.png"));
+app.get("/api/images/user", (req, res) => {
+    res.sendFile(path.join(__dirname, "./assets/images/user.png"));
 });
 
-// wss.on('connection', (ws) => {
-//     // console.log('User ' + ws + ' Connected');
-//     console.log('user connected');
 
-//     ws.on('message', (data) => {
-//         console.log('received: %s', data);
-//     });
-
-// });
 io.on("connection", function(socket) {
     console.log("Users join " + socket.id);
     socket.on('get-document', function(meeting_Id) {
