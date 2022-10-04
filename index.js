@@ -1,6 +1,7 @@
 const user = require('./routes/user');
 const meeting = require('./routes/meeting');
 const room = require('./routes/room');
+const document = require('./routes/document');
 const path = require("path");
 
 const portServer = process.env['PORT'];
@@ -183,19 +184,35 @@ app.get("/api/images/user", (req, res) => {
     res.sendFile(path.join(__dirname, "./assets/images/user.png"));
 });
 
+app.get("/test", async(req, res) => {
+    const response = await document.update_documents('0d991c68-561c-41ae-b437-971ceaab1aa7', '{"test":1}');
+    res.status(response.status_code).send(response.body);
+});
+app.get('/t', async(req, res) => {
+    res.send(await document.create_or_find_document('0d991c68-561c-41ae-b437-971ceaab1aa7'))
+})
 
 io.on("connection", function(socket) {
     console.log("Users join " + socket.id);
-    socket.on('get-document', function(meeting_Id) {
-        let data = ""; //get document 
-        socket.join(meeting_Id)
+
+    socket.on('get-document', function(document_id) {
+        const data = "from server";
+        socket.join(document_id)
         socket.emit('load-document', data);
 
         socket.on('send-changes', function(data) {
-            socket.broadcast.to(meeting_Id).emit('receive-changes', data);
+            console.log(data);
+            socket.broadcast.to(document_id).emit('receive-changes', data);
         });
     });
+
+
+
 });
+io.on("disconnect", (reason) => {
+    console.log(reason);
+});
+
 
 // https://www.youtube.com/watch?v=jD7FnbI76Hg
 

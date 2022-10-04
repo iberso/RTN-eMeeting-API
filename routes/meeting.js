@@ -13,7 +13,7 @@ module.exports = {
         if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
 
         try {
-            const data = await pool.query('SELECT m.id,m.topic,m.description,m.document_path,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Notulis") AS notulis ,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Participant") AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? AND m.date = ? ORDER BY m.date DESC', [nik, selected_date]);
+            const data = await pool.query('SELECT m.id,m.topic,m.description,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Notulis") AS notulis ,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Participant") AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? AND m.date = ? ORDER BY m.date DESC', [nik, selected_date]);
 
             if (data.length != 0) {
                 return helper.http_response(data, 'success', null);
@@ -31,7 +31,7 @@ module.exports = {
         if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
 
         try {
-            const data = await pool.query('SELECT m.id,m.topic,m.description,m.document_path,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Notulis") AS notulis ,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Participant") AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? ORDER BY m.date DESC', [nik]);
+            const data = await pool.query('SELECT m.id,m.topic,m.description,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Notulis") AS notulis ,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Participant") AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? ORDER BY m.date DESC', [nik]);
 
             if (data.length != 0) {
                 return helper.http_response(data, 'success', null);
@@ -49,7 +49,7 @@ module.exports = {
         if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
 
         try {
-            const data = await pool.query('SELECT m.id,m.topic,m.description,m.document_path,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Notulis") AS notulis ,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Participant") AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? AND mp.participant_type = ? ORDER BY m.date DESC', [nik, user_type]);
+            const data = await pool.query('SELECT m.id,m.topic,m.description,DATE_FORMAT(m.time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,m.date,m.id_room,m.meeting_link,m.type,m.notification_type,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Notulis") AS notulis ,(SELECT COUNT(*) FROM meeting_participant WHERE id_meeting = m.id AND participant_type = "Participant") AS participants FROM meeting m JOIN meeting_participant mp ON m.id=mp.id_meeting WHERE mp.id_participant = ? AND mp.participant_type = ? ORDER BY m.date DESC', [nik, user_type]);
 
             if (data.length != 0) {
                 return helper.http_response(data, 'success', null);
@@ -63,7 +63,7 @@ module.exports = {
     async get_meeting_by_meeting_id(id_meeting) {
         if (!id_meeting) return helper.http_response(null, 'error', 'id_meeting is not present', 400);
 
-        let meeting_query = 'SELECT id,topic,description,hasil_meeting,DATE_FORMAT(time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,date,id_room,meeting_link,type,notification_type FROM meeting WHERE id = ?';
+        let meeting_query = 'SELECT id,topic,description,DATE_FORMAT(time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,date,id_room,meeting_link,type,notification_type FROM meeting WHERE id = ?';
         let meeting_query_values = [id_meeting];
 
         try {
@@ -88,7 +88,6 @@ module.exports = {
                     id: meeting_detail[0].id,
                     topic: meeting_detail[0].topic,
                     description: meeting_detail[0].description,
-                    hasil_meeting: meeting_detail[0].hasil_meeting,
                     time_start: meeting_detail[0].time_start,
                     time_end: meeting_detail[0].time_end,
                     date: meeting_detail[0].date,
