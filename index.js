@@ -1,7 +1,7 @@
 const user = require('./routes/user');
 const meeting = require('./routes/meeting');
 const room = require('./routes/room');
-const document = require('./routes/document');
+const Document = require('./routes/document');
 const path = require("path");
 
 const portServer = process.env['PORT'];
@@ -188,24 +188,23 @@ app.get("/test", async(req, res) => {
     const response = await document.update_documents('0d991c68-561c-41ae-b437-971ceaab1aa7', '{"test":1}');
     res.status(response.status_code).send(response.body);
 });
-app.get('/t', async(req, res) => {
-    res.send(await document.create_or_find_document('0d991c68-561c-41ae-b437-971ceaab1aa7'))
-})
 
 io.on("connection", function(socket) {
     console.log("Users join " + socket.id);
 
-    socket.on('get-document', function(document_id) {
-        const data = "from server";
-        socket.join(document_id)
-        socket.emit('load-document', data);
+    socket.on('get-document', async function(meeting_id) {
+        const document_data = await Document.create_or_find_document(meeting_id);
+        socket.join(meeting_id)
+        socket.emit('load-document', document_data);
 
-        socket.on('send-changes', function(data) {
-            console.log(data);
-            socket.broadcast.to(document_id).emit('receive-changes', data);
+        socket.on('send-changes', function(delta) {
+            socket.broadcast.to(meeting_id).emit('receive-changes', delta);
+        });
+
+        socket.on('save-document', async function(data) {
+            await Document.update_documents(meeting_id, data);
         });
     });
-
 
 
 });

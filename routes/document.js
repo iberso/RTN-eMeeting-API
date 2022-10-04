@@ -56,22 +56,4 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async get_documents(meeting_id) {
-        if (!meeting_id) return helper.http_response(null, 'error', 'meeting_id is not present', 400);
-
-        try {
-            const query = 'SELECT document_path FROM meeting WHERE id = ?';
-            const value = [meeting_id];
-            const document_path = await pool.query(query, value);
-            try {
-                const data = await fs.readFileSync(document_path[0].document_path, 'utf8');
-                return helper.http_response(JSON.parse(data), 'success', "Document updated", 200);
-            } catch (err) {
-                console.log(err)
-                return helper.http_response(null, 'error', "File error occurred", 500)
-            }
-        } catch (err) {
-            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
-        }
-    }
 }
