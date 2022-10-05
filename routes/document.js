@@ -20,13 +20,13 @@ module.exports = {
                     const document = await fs.readFileSync(document_path, 'utf8');
                     return document;
                 } else {
-                    const document_data = "";
+                    const document_data = { "ops": [{ "insert": "New Document\n" }] };
                     const document_path = `./files/documents/${meeting_id}.json`;
                     try {
                         const query_update = 'UPDATE meeting set document_path = ? WHERE id = ?';
                         const value_update = [document_path, meeting_id];
                         await pool.query(query_update, value_update);
-                        await fs.writeFileSync(document_path, document_data, 'utf8');
+                        await fs.writeFileSync(document_path, JSON.stringify(document_data), 'utf8');
                         return document_data;
                     } catch (err) {
                         return err;
@@ -46,14 +46,13 @@ module.exports = {
             const value = [meeting_id];
             const document_path = await pool.query(query, value);
             try {
-                await fs.writeFileSync(document_path[0].document_path, document_data, 'utf8');
-
-                return helper.http_response(null, 'success', "Document updated", 200);
+                await fs.writeFileSync(document_path[0].document_path, JSON.stringify(document_data), 'utf8');
+                console.log("Document updated");
             } catch (err) {
-                return helper.http_response(null, 'error', "File error occurred", 500)
+                console.log(err)
             }
         } catch (err) {
-            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+            console.log(err)
         }
     },
 }

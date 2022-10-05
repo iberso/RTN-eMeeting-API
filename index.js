@@ -191,9 +191,10 @@ app.get("/test", async(req, res) => {
 
 io.on("connection", function(socket) {
     console.log("Users join " + socket.id);
-
+    console.log(socket.rooms)
     socket.on('get-document', async function(meeting_id) {
         const document_data = await Document.create_or_find_document(meeting_id);
+
         socket.join(meeting_id)
         socket.emit('load-document', document_data);
 
