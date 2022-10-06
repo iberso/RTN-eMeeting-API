@@ -181,7 +181,8 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
 
 //IMAGES
 app.get("/api/images/user", (req, res) => {
-    res.sendFile(path.join(__dirname, "./assets/images/user.png"));
+    // res.sendFile(path.join(__dirname, "./assets/images/user.png"));
+    res.sendFile("/assets/images/user.png");
 });
 
 app.get("/test", async(req, res) => {
