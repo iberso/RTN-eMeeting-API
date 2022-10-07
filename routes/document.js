@@ -6,6 +6,9 @@ const { randomUUID } = require('crypto');
 const path = require("path");
 
 module.exports = {
+    test() {
+        return console.log(path.join(__dirname, '..', '/files/documents/'));
+    },
     async create_or_find_document(meeting_id) {
         if (!meeting_id) return helper.http_response(null, 'error', 'meeting_id is not present', 400);
         // const document_path = path.join(__dirname, "./files/documents/" + document_id + ".json");
@@ -28,7 +31,7 @@ module.exports = {
                         const query_update = 'UPDATE meeting set document_path = ? WHERE id = ?';
                         const value_update = [document_path, meeting_id];
                         await pool.query(query_update, value_update);
-                        await fs.writeFileSync(path.join(__dirname, document_path), JSON.stringify(document_data), 'utf8');
+                        await fs.writeFileSync(document_path, JSON.stringify(document_data), 'utf8');
                         return document_data;
                     } catch (err) {
                         console.log(err)
@@ -50,7 +53,7 @@ module.exports = {
             const value = [meeting_id];
             const document_path = await pool.query(query, value);
             try {
-                await fs.writeFileSync(path.join(__dirname, document_path[0].document_path), JSON.stringify(document_data), 'utf8');
+                await fs.writeFileSync(document_path[0].document_path, JSON.stringify(document_data), 'utf8');
                 console.log("Document updated");
             } catch (err) {
                 console.log(err)
