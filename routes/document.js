@@ -22,7 +22,8 @@ module.exports = {
                 } else {
                     const document_data = { "ops": [{ "insert": "New Document\n" }] };
                     const document_name = meeting[0].date + " " + meeting[0].time_start + " " + meeting[0].time_end + " " + meeting[0].topic;
-                    const document_path = `./files/documents/${document_name}.json`;
+                    const document_path = path.join(__dirname, `./files/documents/${document_name}.json`);
+
                     try {
                         const query_update = 'UPDATE meeting set document_path = ? WHERE id = ?';
                         const value_update = [document_path, meeting_id];
