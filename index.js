@@ -186,7 +186,7 @@ app.get("/api/images/user", (req, res) => {
 });
 
 app.get("/test", async(req, res) => {
-    const document = await fs.readFileSync("/files/token.json", 'utf8');
+    const document = await fs.readFileSync("./files/token.json", 'utf8');
     res.send(document);
     // res.sendFile(path.join(__dirname, "./files/token.json"));
 });
