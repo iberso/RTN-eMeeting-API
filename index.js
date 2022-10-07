@@ -190,7 +190,7 @@ app.get("/test", async(req, res) => {
     res.send(document);
     // res.sendFile(path.join(__dirname, "./files/token.json"));
 });
-Document.test();
+
 io.on("connection", function(socket) {
     console.log("Users join " + socket.id);
     console.log(socket.rooms)
@@ -211,17 +211,6 @@ io.on("connection", function(socket) {
 
 
 });
-io.on("disconnect", (reason) => {
-    console.log(reason);
-});
-
-
-// https://www.youtube.com/watch?v=jD7FnbI76Hg
-
-
-// app.listen(portServer, () => {
-//     console.log(`REST API listening at ${portServer}`)
-// });
 
 server.listen(portServer, function() {
     console.log(`Rest API listening at ${portServer}`)
