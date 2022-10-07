@@ -21,21 +21,23 @@ module.exports = {
                     return document;
                 } else {
                     const document_data = { "ops": [{ "insert": "New Document\n" }] };
-                    const document_name = meeting[0].date + " " + meeting[0].time_start + " " + meeting[0].time_end + " " + meeting[0].topic;
-                    const document_path = path.join(__dirname, `./files/documents/${document_name}.json`);
+                    const document_name = meeting[0].date + " " + meeting[0].time_start + "-" + meeting[0].time_end + " " + meeting[0].topic;
+                    const document_path = `../files/documents/${document_name}.json`;
 
                     try {
                         const query_update = 'UPDATE meeting set document_path = ? WHERE id = ?';
                         const value_update = [document_path, meeting_id];
                         await pool.query(query_update, value_update);
-                        await fs.writeFileSync(document_path, JSON.stringify(document_data), 'utf8');
+                        await fs.writeFileSync(path.join(__dirname, document_path), JSON.stringify(document_data), 'utf8');
                         return document_data;
                     } catch (err) {
+                        console.log(err)
                         return err;
                     }
                 }
             }
         } catch (err) {
+            console.log(err)
             return err;
         }
     },
@@ -48,7 +50,7 @@ module.exports = {
             const value = [meeting_id];
             const document_path = await pool.query(query, value);
             try {
-                await fs.writeFileSync(document_path[0].document_path, JSON.stringify(document_data), 'utf8');
+                await fs.writeFileSync(path.join(__dirname, document_path[0].document_path), JSON.stringify(document_data), 'utf8');
                 console.log("Document updated");
             } catch (err) {
                 console.log(err)
