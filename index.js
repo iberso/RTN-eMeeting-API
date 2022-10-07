@@ -3,6 +3,7 @@ const meeting = require('./routes/meeting');
 const room = require('./routes/room');
 const Document = require('./routes/document');
 const path = require("path");
+const fs = require('fs');
 
 const portServer = process.env['PORT'];
 const portWebSocket = process.env['PORT_WS'];
@@ -185,8 +186,10 @@ app.get("/api/images/user", (req, res) => {
 });
 
 app.get("/test", async(req, res) => {
-    const response = await document.update_documents('0d991c68-561c-41ae-b437-971ceaab1aa7', '{"test":1}');
-    res.status(response.status_code).send(response.body);
+    const document = await fs.readFileSync(path.join(__dirname, "./files/token.json"), 'utf8');
+    console.log(path.join(__dirname, "./files/token.json"));
+    res.send(document);
+    // res.sendFile(path.join(__dirname, "./files/token.json"));
 });
 
 io.on("connection", function(socket) {

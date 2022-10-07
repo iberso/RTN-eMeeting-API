@@ -10,10 +10,10 @@ module.exports = {
         if (!meeting_id) return helper.http_response(null, 'error', 'meeting_id is not present', 400);
         // const document_path = path.join(__dirname, "./files/documents/" + document_id + ".json");
         try {
-            const query = 'SELECT document_path FROM meeting WHERE id = ?';
+            const query = 'SELECT topic,date,time_start,time_end,document_path FROM meeting WHERE id = ?';
             const value = [meeting_id];
             const meeting = await pool.query(query, value);
-            console.log((meeting.length != 0))
+
             if (meeting.length != 0) {
                 const document_path = meeting[0].document_path;
                 if (document_path) {
@@ -21,7 +21,8 @@ module.exports = {
                     return document;
                 } else {
                     const document_data = { "ops": [{ "insert": "New Document\n" }] };
-                    const document_path = `./files/documents/${meeting_id}.json`;
+                    const document_name = meeting[0].date + " " + meeting[0].time_start + " " + meeting[0].time_end + " " + meeting[0].topic;
+                    const document_path = `./files/documents/${document_name}.json`;
                     try {
                         const query_update = 'UPDATE meeting set document_path = ? WHERE id = ?';
                         const value_update = [document_path, meeting_id];
