@@ -2,7 +2,6 @@ const user = require('./routes/user');
 const meeting = require('./routes/meeting');
 const room = require('./routes/room');
 const Document = require('./routes/document');
-const Image = require('./routes/image');
 const path = require("path");
 const fs = require('fs');
 
@@ -178,7 +177,7 @@ app.get('/api/token-extend', async(req, res) => {
 
 app.get('/api/reset-password-check/:token', async(req, res) => {
     let response = await helper.check_reset_password_token(req.params.token);
-    res.status(response.status_code).send(response.body).con;
+    res.status(response.status_code).send(response.body);
 });
 
 //IMAGES
@@ -187,7 +186,12 @@ app.get("/api/images/user", (req, res) => {
 });
 
 app.get("/api/images/user/:nik", (req, res) => {
-    res.sendFile(path.join(__dirname, "./assets/images/" + nik + ".png"));
+    const response = user.get_user_profile(req.params.nik);
+    if (response.status_code === 200) {
+        res.sendFile(path.join(__dirname, response.body.profile_path));
+    } else {
+        res.status(response.status_code).send(response.body);
+    }
 });
 
 app.get("/test", async(req, res) => {

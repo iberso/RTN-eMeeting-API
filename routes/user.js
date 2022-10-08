@@ -7,7 +7,21 @@ const { urlencoded } = require('body-parser');
 require('dotenv').config();
 
 module.exports = {
+    async get_user_profile(nik) {
+        let sql = 'SELECT profile_path FROM user WHERE nik = ?';
+        let value = [nik];
 
+        try {
+            const data = await pool.query(sql, value);
+            if (data.length != 0) {
+                return helper.http_response(data[0], 'success', null);
+            } else {
+                return helper.http_response(null, 'error', 'User not found', 404)
+            }
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    },
     async get_user(nik = null, req = null) {
         let user_nik;
         if (nik) {
