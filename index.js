@@ -2,6 +2,7 @@ const user = require('./routes/user');
 const meeting = require('./routes/meeting');
 const room = require('./routes/room');
 const Document = require('./routes/document');
+const Image = require('./routes/image');
 const path = require("path");
 const fs = require('fs');
 
@@ -183,6 +184,10 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
 //IMAGES
 app.get("/api/images/user", (req, res) => {
     res.sendFile(path.join(__dirname, "./assets/images/user.png"));
+});
+
+app.get("/api/images/user/:nik", (req, res) => {
+    res.sendFile(path.join(__dirname, "./assets/images/" + nik + ".png"));
 });
 
 app.get("/test", async(req, res) => {
