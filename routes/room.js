@@ -2,7 +2,7 @@ const helper = require("../helper");
 const pool = require('../database');
 
 module.exports = {
-    async get_all_room(status) {
+    async get_all_room_by_status(status) {
         if (!status.current_meeting_id) return helper.http_response(null, 'error', 'current meeting id is not present in body', 400);
         if (!status.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
         if (!status.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
@@ -13,6 +13,15 @@ module.exports = {
             let rooms_query_values = [status.current_meeting_id, status.date, status.time_end, status.time_start];
             let rooms_data = await pool.query(rooms_query, rooms_query_values);
 
+            return helper.http_response(rooms_data, 'success', null);
+        } catch (err) {
+            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
+        }
+    },
+    async get_all_room() {
+        try {
+            let rooms_query = 'SELECT * FROM room';
+            let rooms_data = await pool.query(rooms_query);
             return helper.http_response(rooms_data, 'success', null);
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)

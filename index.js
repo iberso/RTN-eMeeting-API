@@ -152,7 +152,13 @@ app.put('/api/room/:id_room', middleware.check_authorization, async(req, res) =>
 
 //DONE
 app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
-    let response = await room.get_all_room(req.body);
+    let response = await room.get_all_room_by_status(req.body);
+    res.status(response.status_code).send(response.body);
+});
+
+//DONE
+app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
+    let response = await room.get_all_room();
     res.status(response.status_code).send(response.body);
 });
 
