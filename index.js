@@ -115,6 +115,32 @@ app.post('/api/user/request-change-password', async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
+//DONE
+app.put('/api/user/:nik/profile', middleware.check_authorization, async(req, res) => {
+    upload(req, res, async(err) => {
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            return helper.http_response(null, 'error', err.message, 400);
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            return helper.http_response(null, 'error', err.message, 403);
+        }
+        // Everything went fine.
+        const response = await user.edit_user_profile(req.file.path, req.params.nik);
+        res.status(response.status_code).send(response.body);
+    });
+});
+
+//DONE
+app.get("/api/user/:nik/profile", async(req, res) => {
+    const response = await user.get_user_profile(req.params.nik);
+    if (response.status_code === 200) {
+        res.sendFile(path.join(__dirname, '/', response.body.data));
+    } else {
+        res.status(response.status_code).send(response.body);
+    }
+});
+
 // Meeting Services
 
 //DONE
@@ -213,30 +239,7 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
     res.status(response.status_code).send(response.body);
 });
 
-//IMAGES
-app.put('/api/user/:nik/profile', async(req, res) => {
-    upload(req, res, async(err) => {
-        if (err instanceof multer.MulterError) {
-            // A Multer error occurred when uploading.
-            return helper.http_response(null, 'error', err.message, 400);
-        } else if (err) {
-            // An unknown error occurred when uploading.
-            return helper.http_response(null, 'error', err.message, 403);
-        }
-        // Everything went fine.
-        const response = await user.edit_user_profile(req.file.path, req.params.nik);
-        res.status(response.status_code).send(response.body);
-    });
-});
 
-app.get("/api/user/:nik/profile", async(req, res) => {
-    const response = await user.get_user_profile(req.params.nik);
-    if (response.status_code === 200) {
-        res.sendFile(path.join(__dirname, '/', response.body.data));
-    } else {
-        res.status(response.status_code).send(response.body);
-    }
-});
 
 io.on("connection", function(socket) {
     console.log("Users join " + socket.id);
