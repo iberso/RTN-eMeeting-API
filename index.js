@@ -214,39 +214,28 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
 });
 
 //IMAGES
-app.post('/api/user/profile', (req, res) => {
-    upload(req, req, (err) => {
+app.put('/api/user/:nik/profile', async(req, res) => {
+    upload(req, res, async(err) => {
         if (err instanceof multer.MulterError) {
             // A Multer error occurred when uploading.
-            return res.status(400).send(err.message);
+            return helper.http_response(null, 'error', err.message, 400);
         } else if (err) {
             // An unknown error occurred when uploading.
-            return res.status(500).send(err.message);
+            return helper.http_response(null, 'error', err.message, 403);
         }
         // Everything went fine.
-        res.send('image uploaded');
-        console.log(req.file.path)
+        const response = await user.edit_user_profile(req.file.path, req.params.nik);
+        res.status(response.status_code).send(response.body);
     });
-
 });
 
-app.get("/api/images/user", (req, res) => {
-    res.sendFile(path.join(__dirname, "./assets/images/user.png"));
-});
-
-app.get("/api/images/user/:nik", (req, res) => {
-    const response = user.get_user_profile(req.params.nik);
+app.get("/api/user/:nik/profile", async(req, res) => {
+    const response = await user.get_user_profile(req.params.nik);
     if (response.status_code === 200) {
-        res.sendFile(path.join(__dirname, response.body.profile_path));
+        res.sendFile(path.join(__dirname, '/', response.body.data));
     } else {
         res.status(response.status_code).send(response.body);
     }
-});
-
-app.get("/test", async(req, res) => {
-    const document = await fs.readFileSync("/files/token.json", 'utf8');
-    res.send(document);
-    // res.sendFile(path.join(__dirname, "./files/token.json"));
 });
 
 io.on("connection", function(socket) {

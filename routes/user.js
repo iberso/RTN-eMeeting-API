@@ -4,17 +4,40 @@ const jwt = require('jsonwebtoken');
 let util = require('util');
 const bcrypt = require("bcrypt");
 const { urlencoded } = require('body-parser');
+
 require('dotenv').config();
 
 module.exports = {
+    async edit_user_profile(file_path, nik) {
+        const sql_user = 'SELECT * FROM user WHERE nik = ?';
+        const value_user = [nik];
+        const result = await pool.query(sql_user, value_user);
+
+        if (result.length === 0) {
+            return helper.http_response(null, 'error', 'User not found', 404)
+        }
+
+        try {
+            let sql = 'UPDATE user SET profile_picture_path = ? WHERE nik = ?';
+            let value = [file_path, nik];
+            await pool.query(sql, value);
+            return helper.http_response(null, 'success', 'User profile picture updated!');
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    },
     async get_user_profile(nik) {
-        let sql = 'SELECT profile_path FROM user WHERE nik = ?';
+        let sql = 'SELECT profile_picture_path FROM user WHERE nik = ?';
         let value = [nik];
 
         try {
             const data = await pool.query(sql, value);
             if (data.length != 0) {
-                return helper.http_response(data[0], 'success', null);
+                if (data[0].profile_picture_path != null) {
+                    return helper.http_response(data[0].profile_picture_path, 'success', null);
+                } else {
+                    return helper.http_response('assets/images/user.png', 'success', null);
+                }
             } else {
                 return helper.http_response(null, 'error', 'User not found', 404)
             }
