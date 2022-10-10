@@ -135,6 +135,7 @@ app.put('/api/user/:nik/profile', middleware.check_authorization, async(req, res
 app.get("/api/user/:nik/profile", async(req, res) => {
     const response = await user.get_user_profile(req.params.nik);
     if (response.status_code === 200) {
+        console.log(response.body.data);
         res.sendFile(path.join(__dirname, '/', response.body.data));
     } else {
         res.status(response.status_code).send(response.body);
