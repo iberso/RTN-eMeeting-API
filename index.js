@@ -5,6 +5,32 @@ const Document = require('./routes/document');
 const path = require("path");
 const fs = require('fs');
 
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "./assets/images/users_profile/")
+    },
+    filename: (req, file, cb) => {
+        console.log(file);
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+})
+
+const maxFileSize = 1 * 1024 * 1024; //1 MB
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'image/png' ||
+            file.mimetype === 'image/jpg' ||
+            file.mimetype === 'image/jpeg') {
+            cb(null, true)
+        } else {
+            cb(new Error('Only .png, .jpg, .jpeg format Allowed!'), false);
+        }
+    },
+    limits: { fileSize: maxFileSize }
+}).single('profile_photo');
+
 const portServer = process.env['PORT'];
 const portWebSocket = process.env['PORT_WS'];
 
@@ -20,11 +46,12 @@ const io = require('socket.io')(server, {
 });
 
 const bodyParser = require('body-parser')
-const { json } = require("express");
+const { json, application } = require("express");
 const helper = require('./helper');
 const middleware = require('./middleware');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const { MulterError } = require('multer');
 
 require('dotenv').config();
 
@@ -187,6 +214,22 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
 });
 
 //IMAGES
+app.post('/api/user/profile', (req, res) => {
+    upload(req, req, (err) => {
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            return res.status(400).send(err.message);
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            return res.status(500).send(err.message);
+        }
+        // Everything went fine.
+        res.send('image uploaded');
+        console.log(req.file.path)
+    });
+
+});
+
 app.get("/api/images/user", (req, res) => {
     res.sendFile(path.join(__dirname, "./assets/images/user.png"));
 });
