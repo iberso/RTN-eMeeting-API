@@ -33,7 +33,7 @@ module.exports = {
         try {
             const data = await pool.query(sql, value);
             if (data.length != 0) {
-                console.log(data[0].profile_picture_path.length)
+                console.log(data[0].profile_picture_path)
                 if (data[0].profile_picture_path != null) {
                     return helper.http_response(data[0].profile_picture_path, 'success', null);
                 } else {
