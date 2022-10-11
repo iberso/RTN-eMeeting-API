@@ -113,10 +113,15 @@ app.put('/api/user/reset-password/:token', async(req, res) => {
 app.post('/api/user/request-change-password', async(req, res) => {
     let response = await user.request_change_password(req.body);
     res.status(response.status_code).send(response.body);
-})
-
+});
+// middleware.check_authorization,
 //DONE
-app.put('/api/user/:nik/profile', middleware.check_authorization, async(req, res) => {
+app.put('/api/user/:nik/profile', async(req, res) => {
+    const response = await user.get_user_profile(req.params.nik);
+    if (response.status_code === 200) {
+        fs.unlinkSync(path.join(__dirname, '/', response.body.data));
+    }
+
     upload(req, res, async(err) => {
         if (err instanceof multer.MulterError) {
             // A Multer error occurred when uploading.
@@ -135,7 +140,6 @@ app.put('/api/user/:nik/profile', middleware.check_authorization, async(req, res
 app.get("/api/user/:nik/profile", async(req, res) => {
     const response = await user.get_user_profile(req.params.nik);
     if (response.status_code === 200) {
-        console.log(response.body.data);
         res.sendFile(path.join(__dirname, '/', response.body.data));
     } else {
         res.status(response.status_code).send(response.body);
@@ -211,7 +215,7 @@ app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
 });
 
 //DONE
-app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
+app.get('/api/rooms', middleware.check_authorization, async(req, res) => {
     let response = await room.get_all_room();
     res.status(response.status_code).send(response.body);
 });
@@ -243,8 +247,8 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
 
 
 io.on("connection", function(socket) {
-    console.log("Users join " + socket.id);
-    console.log(socket.rooms)
+    console.log("Users Connected : " + socket.id);
+
     socket.on('get-document', async function(meeting_id) {
         const document_data = await Document.create_or_find_document(meeting_id);
 
@@ -260,7 +264,9 @@ io.on("connection", function(socket) {
         });
     });
 
-
+    socket.on('disconnect', function() {
+        console.log("Users disconnected : " + socket.id);
+    });
 });
 
 server.listen(portServer, function() {
