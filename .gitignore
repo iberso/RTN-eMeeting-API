@@ -1,5 +1,9 @@
 files/documents/*
 !files/documents/.gitkeep
+
+assets/images/users_profile/*
+!assets/images/users_profile/.gitkeep
+
 .DS_Store
 
 # Logs
