@@ -55,8 +55,12 @@ module.exports = {
             user_nik = decoded_token.data.nik;
         }
         try {
-            data = await pool.query('SELECT nik,email_address,device_token FROM user WHERE nik = ?', [user_nik])
+            data = await pool.query('SELECT nik, email_address, device_token, id_role FROM user WHERE nik = ?', [user_nik])
+            const role = await pool.query('SELECT * FROM role');
+
             if (data.length != 0) {
+                data[0].role = role[data[0].id_role]
+                delete data[0].id_role;
                 return helper.http_response(data[0], 'success', null);
             } else {
                 return helper.http_response(null, 'error', 'User not found', 404)
@@ -121,11 +125,15 @@ module.exports = {
         let value = [user.nik]
         try {
             let data = await pool.query(sql, value);
+            const role = await pool.query('SELECT * FROM role');
+
             let res_data = {
                 'nik': data[0].nik,
                 'email_address': data[0].email_address,
                 'device_token': data[0].device_token,
+                'role': role[data[0].id_role]
             }
+
             let result = await bcrypt.compare(user.password, data[0].password);
             if (result) {
                 const token = await jwt.sign({
@@ -155,7 +163,7 @@ module.exports = {
 
     async edit_user(req) {
         let user = req.body;
-        if (!user.new_password && !user.email_address) return helper.http_response(null, 'error', 'new password or email address is not present in body', 400)
+        if (!user.email_address) return helper.http_response(null, 'error', 'email address is not present in body', 400)
 
         let token = helper.get_token_from_headers(req);
         let decoded_token = jwt.decode(token)
@@ -163,37 +171,28 @@ module.exports = {
         let api_response = await this.get_user(decoded_token.data.nik);
         if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
 
-        const hash_password = await bcrypt.hash(user.new_password, 10);
-
-        let sql = 'UPDATE user SET email_address = ?, password = ? WHERE nik = ?';
-
-        let value = [
+        sql = 'UPDATE user SET email_address = ? WHERE nik = ?';
+        value = [
             user.email_address,
-            hash_password,
             decoded_token.data.nik
         ];
-
-        if (user.email_address && !user.password) {
-            sql = 'UPDATE user SET email_address = ? WHERE nik = ?';
-            value = [
-                user.email_address,
-                decoded_token.data.nik
-            ];
-        } else if (!user.email_address && user.password) {
-            sql = 'UPDATE user SET password = ? WHERE nik = ?';
-            value = [
-                hash_password,
-                decoded_token.data.nik
-            ];
-        }
 
         try {
             await pool.query(sql, value);
             data = {
                 'nik': decoded_token.data.nik,
                 'email_address': user.email_address,
+                'device_token': decoded_token.data.device_token,
+                'role': decoded_token.data.role
             }
-            return helper.http_response(data, 'success', "Account updated successfully");
+            const token = await jwt.sign({
+                exp: Math.floor(Date.now() / 1000) +
+                    parseInt(process.env['JWT_EXP_TIME_IN_SECONDS']),
+                data: data
+            }, process.env['JWT_SECRET_KEY'], { algorithm: 'HS256' });
+            helper.add_token(token)
+
+            return helper.http_response(null, 'success', "Successfully Edit User Data", 200, token);
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
