@@ -118,7 +118,7 @@ app.post('/api/user/request-change-password', async(req, res) => {
 //DONE
 app.put('/api/user/:nik/profile', async(req, res) => {
     const response = await user.get_user_profile(req.params.nik);
-    if (response.status_code === 200) {
+    if (response.status_code === 200 && response.body.data != 'assets/images/user.png') {
         fs.unlinkSync(path.join(__dirname, '/', response.body.data));
     }
 
