@@ -11,7 +11,6 @@ const storage = multer.diskStorage({
         cb(null, "./assets/images/users_profile/")
     },
     filename: (req, file, cb) => {
-        console.log(file);
         cb(null, Date.now() + path.extname(file.originalname));
     }
 })
@@ -25,7 +24,7 @@ const upload = multer({
             file.mimetype === 'image/jpeg') {
             cb(null, true)
         } else {
-            cb(new Error('Only .png, .jpg, .jpeg format Allowed!'), false);
+            cb(new Error('Only .png, .jpg, .jpeg format Allowed!'));
         }
     },
     limits: { fileSize: maxFileSize }
@@ -117,23 +116,23 @@ app.post('/api/user/request-change-password', async(req, res) => {
 // middleware.check_authorization,
 //DONE
 app.put('/api/user/:nik/profile', async(req, res) => {
-    const response = await user.get_user_profile(req.params.nik);
-    if (response.status_code === 200 && response.body.data != 'assets/images/user.png') {
-        fs.unlinkSync(path.join(__dirname, '/', response.body.data));
-    }
-
     upload(req, res, async(err) => {
-        if (err instanceof multer.MulterError) {
-            // A Multer error occurred when uploading.
-            return helper.http_response(null, 'error', err.message, 400);
-        } else if (err) {
+        if (err) {
             // An unknown error occurred when uploading.
-            return helper.http_response(null, 'error', err.message, 403);
+            const response = helper.http_response(null, 'error', err.message, 403);
+            return res.status(response.status_code).send(response.body);
         }
+
         // Everything went fine.
+        const response_get = await user.get_user_profile(req.params.nik);
+        if (response_get.status_code === 200 && response_get.body.data != 'assets/images/user.png') {
+            fs.unlinkSync(path.join(__dirname, '/', response_get.body.data));
+        }
+
         const response = await user.edit_user_profile(req.file.path, req.params.nik);
         res.status(response.status_code).send(response.body);
     });
+
 });
 
 //DONE
