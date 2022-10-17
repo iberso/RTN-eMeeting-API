@@ -72,11 +72,34 @@ module.exports = {
 
     async get_all_users() {
         try {
-            data = await pool.query('SELECT nik,email_address,device_token FROM user')
+            const data = await pool.query('SELECT nik, email_address, profile_picture_path, device_token,id_role FROM user');
+
+            //untuk mengambil semua role
+            const api_response = await this.get_roles();
+            if (api_response.status_code === 404) return api_response;
+
+            data.forEach(element => {
+                element.role = api_response.body.data[element.id_role];
+                delete element.id_role;
+            });
+
             if (data.length != 0) {
                 return helper.http_response(data, 'success', null);
             } else {
                 return helper.http_response(null, 'error', 'Data User is empty', 404)
+            }
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    },
+
+    async get_roles() {
+        try {
+            const data = await pool.query('SELECT * FROM role');
+            if (data.length != 0) {
+                return helper.http_response(data, 'success', null);
+            } else {
+                return helper.http_response(null, 'error', 'Data Role is empty', 404)
             }
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
