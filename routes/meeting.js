@@ -75,6 +75,17 @@ module.exports = {
                 let participants_query_values = [id_meeting];
                 let participants_data = await pool.query(participants_query, participants_query_values);
 
+                //untuk mengambil semua data user
+                const api_response_get_participant = await user.get_all_users();
+                if (api_response_get_participant.status_code === 404) return api_response_get_participant;
+
+                //untuk menambahkan email address pada participants data
+                participants_data.forEach(user => {
+                    const all_user = api_response_get_participant.body.data;
+                    const user_index = all_user.findIndex((curr_user) => curr_user.nik == user.id_participant);
+                    user.email_address = all_user[user_index].email_address;
+                });
+
                 let api_response = {
                     'body': {
                         'data': null
@@ -159,6 +170,10 @@ module.exports = {
                 let query = 'INSERT INTO meeting_participant (id,id_meeting,id_participant,participant_type) VALUES ?';
                 let values = [meeting.participants.map(participant => [uuid.v4(), uuid_meeting, participant.nik, participant.type])];
                 await pool.query(query, values);
+
+                const api_response = await this.get_meeting_by_meeting_id(uuid_meeting);
+                await helper.send_mail_new_meeting(api_response.body.data);
+
                 return helper.http_response(null, 'success', "meeting created successfully", 201);
             } catch (err) {
                 return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)

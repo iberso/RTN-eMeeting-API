@@ -189,6 +189,48 @@ module.exports = {
         });
     },
 
+    send_mail_new_meeting(meeting) {
+        const template = fs.readFileSync('./template/mailer/new-meeting.html', 'utf8');
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env['EMAIL_ADDRESS'],
+                pass: process.env['EMAIL_APP_KEY']
+            }
+        });
+
+        const meeting_topic = meeting.topic;
+        const meeting_date = meeting.date;
+
+        meeting.participants.forEach(function(to, i, array) {
+            const current_user = to.id_participant;
+            console.log(to);
+            const mailOption = {
+                from: {
+                    name: 'Rutan E-Meeting Mailer',
+                    address: process.env['EMAIL_ADDRESS']
+                },
+                subject: 'Meeting Invitation: ' + meeting.topic,
+                html: mustache.render(template, { meeting_topic, meeting_date, current_user }),
+                attachments: [{
+                    filename: 'logo_rutan.png',
+                    path: './assets/images/logo_rutan.png',
+                    cid: 'logo_rutan'
+                }]
+            }
+            console.log(to.email_address);
+            mailOption.to = to.email_address;
+
+            transporter.sendMail(mailOption, function(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("email send");
+                }
+            });
+        });
+    },
     generate_values_placeholder(arr_key) {
         let placeholder = [];
         for (let idx = 0; idx < arr_key.length; idx++) {

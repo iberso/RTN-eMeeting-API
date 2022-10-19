@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutan E Meeting Mailer</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<!-- width: 450px;  -->
+
+<body style="background-color:#EDF2F6; font-family: 'Nunito', sans-serif; padding-top: 20px; padding-bottom: 20px; padding-right: 100px; padding-left: 100px;">
+    <table style="width: 50%;background-color: white;border-radius: 10px; border: solid #aaaaaa 1px; margin-left: auto;margin-right: auto;">
+        <tr>
+            <td>
+                <table style="font-size: 11pt; margin: 20px; width: 96%;">
+                    <tr>
+                        <td colspan="3" style="text-align: center;"><img src="cid:logo_rutan" alt="logo PT. RUTAN" width="80px"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-size: 18pt; font-weight: bold; text-align: center;">E-Meeting PT. RUTAN</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 20px;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="font-weight: bold; font-size: 13pt;">Hi, {{current_user}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 15px;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">You've been invited to attend <span style="font-weight: bold;">'{{meeting_topic}}'</span>.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 30px;"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="font-weight: bold;">Meeting Details : </span><br>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 10px;"></td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span style="font-weight: bold;">Date</span><br>
+                            <span>{{meeting_date}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 10px;"></td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span style="font-weight: bold;">Location</span><br>
+                            <span>{{meeting_link}} {{meeting_location}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 10px;"></td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span style="font-weight: bold;">Participants</span><br>
+                            <span>{{meeting_participants}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 15px;"></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
