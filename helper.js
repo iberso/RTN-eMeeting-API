@@ -202,12 +202,12 @@ module.exports = {
         });
 
         const meeting_topic = meeting.topic;
-        const meeting_date = moment(meeting.date).format('dddd, Do MMMM YYYY') + " " + meeting.time_start + " - " + meeting.time_end;
+        const meeting_date = '<strong>' + moment(meeting.date).format('dddd, Do MMMM YYYY') + " " + meeting.time_start + " - " + meeting.time_end + '</strong>';
         const meeting_location = meeting.type + " " + (meeting.type != 'Online') ? meeting.room.room_name : "" + " " + (meeting.type != 'Onsite') ? meeting.meeting_link : "";
 
         meeting.participants.forEach(function(to, i, array) {
             const current_user = to.id_participant;
-            console.log(to);
+
             const mailOption = {
                 from: {
                     name: 'Rutan E-Meeting Mailer',

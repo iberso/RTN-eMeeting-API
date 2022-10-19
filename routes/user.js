@@ -69,7 +69,6 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-
     async get_all_users() {
         try {
             const data = await pool.query('SELECT nik, email_address, profile_picture_path, device_token,id_role FROM user');
@@ -183,7 +182,34 @@ module.exports = {
             return helper.http_response(null, 'error', 'token invalid', 401)
         }
     },
+    async change_user_role(req) {
+        if (!req.body.role_id) return helper.http_response(null, 'error', 'role_id is not present in body', 400);
 
+        let token = helper.get_token_from_headers(req);
+        const current_user = jwt.decode(token, process.env['JWT_SECRET_KEY']);
+        console.log(current_user.data.role);
+
+        if (current_user.data.role.role_name != 'Super Admin') return helper.http_response(null, 'error', 'current user was not Super Admin', 401);
+
+        const api_response = await this.get_user(req.params.nik, req);
+        if (api_response.status_code === 404) return api_response;
+
+        const api_response_role = await this.get_roles();
+        if (api_response_role.status_code === 404) return api_response_role;
+
+        if (!api_response_role.body.data[req.body.role_id]) return helper.http_response(null, 'error', 'role_id was not valid', 403);
+
+        if (current_user.data.role.role_name === "Super Admin") {
+            try {
+                const query = "UPDATE user SET id_role = ? WHERE nik = ?;"
+                const value = [req.body.role_id, req.params.nik];
+                await pool.query(query, value);
+                return helper.http_response(null, 'success', 'succes change user role', 200);
+            } catch (err) {
+                return helper.http_response(null, 'error', "Database error occurredd: " + err, 500);
+            }
+        }
+    },
     async edit_user(req) {
         let user = req.body;
         if (!user.email_address) return helper.http_response(null, 'error', 'email address is not present in body', 400)

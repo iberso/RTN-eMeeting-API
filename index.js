@@ -135,6 +135,11 @@ app.put('/api/user/:nik/profile', async(req, res) => {
 
 });
 
+app.put('/api/user/:nik/role', async(req, res) => {
+    const response = await user.change_user_role(req);
+    res.status(response.status_code).send(response.body);
+});
+
 //DONE
 app.get("/api/user/:nik/profile", async(req, res) => {
     const response = await user.get_user_profile(req.params.nik);
