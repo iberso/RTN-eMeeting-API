@@ -187,7 +187,6 @@ module.exports = {
 
         let token = helper.get_token_from_headers(req);
         const current_user = jwt.decode(token, process.env['JWT_SECRET_KEY']);
-        console.log(current_user.data.role);
 
         if (current_user.data.role.role_name != 'Super Admin') return helper.http_response(null, 'error', 'current user was not Super Admin', 401);
 
