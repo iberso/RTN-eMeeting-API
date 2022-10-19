@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const mustache = require('mustache');
+const moment = require('moment');
 
 require('dotenv').config();
 
@@ -201,7 +202,8 @@ module.exports = {
         });
 
         const meeting_topic = meeting.topic;
-        const meeting_date = meeting.date;
+        const meeting_date = moment(meeting.date).format('dddd, Do MMMM YYYY') + " " + meeting.time_start + " - " + meeting.time_end;
+        const meeting_location = meeting.type + " " + (meeting.type != 'Online') ? meeting.room.room_name : "" + " " + (meeting.type != 'Onsite') ? meeting.meeting_link : "";
 
         meeting.participants.forEach(function(to, i, array) {
             const current_user = to.id_participant;
@@ -212,7 +214,7 @@ module.exports = {
                     address: process.env['EMAIL_ADDRESS']
                 },
                 subject: 'Meeting Invitation: ' + meeting.topic,
-                html: mustache.render(template, { meeting_topic, meeting_date, current_user }),
+                html: mustache.render(template, { meeting_topic, meeting_date, current_user, meeting_location }),
                 attachments: [{
                     filename: 'logo_rutan.png',
                     path: './assets/images/logo_rutan.png',
