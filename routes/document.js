@@ -59,4 +59,18 @@ module.exports = {
             console.log(err)
         }
     },
+    async approve_document(meeting_id, user_id, approval_status) {
+        if (!meeting_id) return helper.http_response(null, 'error', 'meeting_id is not present', 400);
+        if (!approval_status) return helper.http_response(null, 'error', 'approval_status is not present', 400);
+        if (!user_id) return helper.http_response(null, 'error', 'user_id is not present', 400);
+
+        try {
+            const query = 'UPDATE meeting_participant set approval_status = ? WHERE id_meeting = ? AND id_participant = ?';
+            const value = [approval_status, meeting_id, user_id];
+            await pool.query(query, value);
+            return helper.http_response(null, 'success', 'approval status updated!');
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+        }
+    }
 }

@@ -69,7 +69,9 @@ module.exports = {
         try {
             let meeting_detail = await pool.query(meeting_query, meeting_query_values);
             if (meeting_detail.length != 0) {
-                let participants_query = 'SELECT id_participant,participant_type,IF(approve_notulensi = 1,"true","false") AS approve_notulensi,IF(attendance = 1,"true","false") AS attendance FROM meeting_participant WHERE id_meeting = ? ORDER BY participant_type ASC';
+                // let participants_query = 'SELECT id_participant,participant_type,IF(approve_notulensi = 1,"true","false") AS approve_notulensi,IF(attendance = 1,"true","false") AS attendance FROM meeting_participant WHERE id_meeting = ? ORDER BY participant_type ASC';
+                const participants_query = 'SELECT id_participant, participant_type, approval_status, IF(attendance = 1,"true","false") AS attendance FROM meeting_participant WHERE id_meeting = ? ORDER BY participant_type ASC';
+
                 let participants_query_values = [id_meeting];
                 let participants_data = await pool.query(participants_query, participants_query_values);
 

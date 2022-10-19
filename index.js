@@ -159,6 +159,12 @@ app.put('/api/meeting/:meeting_id', middleware.check_authorization, async(req, r
     res.status(response.status_code).send(response.body);
 });
 
+//ON GOING
+app.put('/api/meeting/:meeting_id/approval', middleware.check_authorization, async(req, res) => {
+    const response = await Document.approve_document(req.params.meeting_id, req.body.user_id, req.body.approval_status);
+    res.status(response.status_code).send(response.body);
+});
+
 //DONE
 app.post('/api/meeting', middleware.check_authorization, async(req, res) => {
     let response = await meeting.add_meeting(req.body);
@@ -243,8 +249,6 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
     res.status(response.status_code).send(response.body);
 });
 
-
-
 io.on("connection", function(socket) {
     console.log('===============================')
     console.log("Users Connected : " + socket.id);
@@ -262,6 +266,11 @@ io.on("connection", function(socket) {
         socket.on('save-document', async function(data) {
             await Document.update_documents(meeting_id, data);
         });
+    });
+
+    socket.on('leave-document', function(meeting_id) {
+        socket.leave(meeting_id);
+        console.log(io.sockets.adapter.rooms)
     });
 
     socket.on('disconnect', function() {
