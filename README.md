@@ -1,4 +1,6 @@
-# Headers
+# REST API
+
+### Headers
 
 ```json
 {
@@ -6,7 +8,8 @@
    "Authorization": "Bearer <String:jwt token>"
 }
 ```
-### Responses:
+
+### Responses
 ![OK](https://badgen.net/badge/OK/200/green)
 ```json
 {
@@ -39,8 +42,9 @@
 
 # User
 
-## Request: get current login user
+### Request: get current login user
 ![GET](https://badgen.net/badge/Method/GET/green)<span style="margin-left:12px; font-size:12pt;">**/api/user**</span>
+
 ### Headers :
 ```json
 {
@@ -48,6 +52,7 @@
    "Authorization": "Bearer <String:jwt token>"
 }
 ```
+
 ### Responses:
 #### Request: get current login user
 ![OK](https://badgen.net/badge/OK/200/green)
