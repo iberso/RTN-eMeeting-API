@@ -1,6 +1,6 @@
 # REST API
 
-### Headers
+### Request Headers
 
 ```json
 {
@@ -42,7 +42,7 @@
 
 # User
 
-### Request: get current login user
+### Request : get current login user
 ![GET](https://badgen.net/badge/Method/GET/green)<span style="margin-left:12px; font-size:12pt;">**/api/user**</span>
 
 ### Headers :
@@ -60,9 +60,13 @@
 {
     "status": "success",
     "data": {
-        "nik": 123450,
-        "email_address": "loremipsum@example.com",
-        "device_token": null
+        "nik": 123456,
+        "email_address": "example@example.example",
+        "device_token": "<String: device token from firebase>",
+        "role": {
+            "id": 0,
+            "role_name": "Super Admin"
+        }
     }
 }
 ```

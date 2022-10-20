@@ -119,6 +119,7 @@ app.put('/api/user/:nik/profile', async(req, res) => {
     upload(req, res, async(err) => {
         if (err) {
             // An unknown error occurred when uploading.
+            console.log(err);
             const response = helper.http_response(null, 'error', err.message, 403);
             return res.status(response.status_code).send(response.body);
         }
