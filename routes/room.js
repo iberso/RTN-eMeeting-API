@@ -49,15 +49,15 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async edit_room(name, id_room) {
+    async edit_room(room_name, id_room) {
         if (!id_room) return helper.http_response(null, 'error', 'id is not present in body', 400)
-        if (!name) return helper.http_response(null, 'error', 'room_name is not present in body', 400)
+        if (!room_name) return helper.http_response(null, 'error', 'room_name is not present in body', 400)
 
         let api_response = await this.get_room_by_id(id_room);
         if (api_response.status_code === 404) return helper.http_response(null, 'error', 'room not found', 404);
 
         try {
-            await pool.query('UPDATE room set room_name = ? WHERE id = ?', [name, id_room])
+            await pool.query('UPDATE room set room_name = ? WHERE id = ?', [room_name, id_room])
             return helper.http_response(null, 'success', 'room updated successfully');
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)

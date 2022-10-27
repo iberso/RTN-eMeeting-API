@@ -215,7 +215,7 @@ app.get('/api/room/:id_room', middleware.check_authorization, async(req, res) =>
 
 //DONE
 app.put('/api/room/:id_room', middleware.check_authorization, async(req, res) => {
-    let response = await room.edit_room(req.body, req.params.id_room);
+    let response = await room.edit_room(req.body.room_name, req.params.id_room);
     res.status(response.status_code).send(response.body);
 });
 
@@ -266,7 +266,9 @@ io.on("connection", function(socket) {
         socket.emit('load-document', document_data);
 
         socket.on('send-changes', function(delta) {
-            socket.broadcast.to(meeting_id).emit('receive-changes', delta);
+            socket.to(meeting_id).emit('receive-changes', delta);
+
+            // socket.broadcast.to(meeting_id).emit('receive-changes', delta);
         });
 
         socket.on('save-document', async function(data) {
@@ -276,6 +278,10 @@ io.on("connection", function(socket) {
 
     socket.on('leave-document', function(meeting_id) {
         socket.leave(meeting_id);
+    });
+
+    socket.on('check', function() {
+        console.log("My Socket ID : " + socket.id)
         console.log(io.sockets.adapter.rooms)
     });
 
