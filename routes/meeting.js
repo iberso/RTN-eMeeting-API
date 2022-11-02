@@ -310,6 +310,7 @@ module.exports = {
 
             return helper.http_response(null, 'success', 'success update participants attendace');
         } catch (err) {
+            console.log(err);
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
 
