@@ -307,6 +307,7 @@ module.exports = {
             });
 
             participant_query = participant_query.join(';');
+            participant_query += ';';
             await pool.query(participant_query, participant_value);
 
             return helper.http_response(null, 'success', 'success update participants attendace');
