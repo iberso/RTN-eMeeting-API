@@ -171,6 +171,11 @@ app.put('/api/meeting/:meeting_id/approval', middleware.check_authorization, asy
     res.status(response.status_code).send(response.body);
 });
 
+app.put('/api/meeting/:meeting_id/attendance', middleware.check_authorization, async(req, res) => {
+    const response = await meeting.edit_participant_attendance(req.params.meeting_id, req.body.participants, req);
+    res.status(response.status_code).send(response.body);
+});
+
 //DONE
 app.post('/api/meeting', middleware.check_authorization, async(req, res) => {
     let response = await meeting.add_meeting(req.body);
