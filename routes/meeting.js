@@ -279,7 +279,7 @@ module.exports = {
         const api_response_meeting = await this.get_meeting_by_meeting_id(id_meeting);
         if (api_response_meeting.status_code === 404) return helper.http_response(null, 'error', 'meeting not found', 404);
 
-        const token = helper.get_token_from_headers(req);
+        const token = helper.get_token_from_headers(current_user);
         const decoded_token = jwt.decode(token)
 
         const api_response = await user.get_user(decoded_token.data.nik);
