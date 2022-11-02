@@ -305,7 +305,7 @@ module.exports = {
                 participant_value.push(participant.id_participant)
                 participant_value.push(id_meeting);
             });
-            participant_query.push(';');
+
             participant_query = participant_query.join(';');
             await pool.query(participant_query, participant_value);
 
