@@ -290,6 +290,8 @@ module.exports = {
 
         const allowed_user_type = ['Host', 'Notulis'];
 
+        console.log(participants[index_current_user].participant_type);
+
         if (!allowed_user_type.includes(participants[index_current_user].participant_type)) return helper.http_response(null, 'error', 'current user was not Host or Notulis', 401);
 
         try {
