@@ -271,5 +271,39 @@ module.exports = {
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
+    },
+    async edit_participant_attendance(participants, current_user) {
+        if (!participants) return helper.http_response(null, 'error', 'participants is not present in body', 400);
+
+        const token = helper.get_token_from_headers(req);
+        const decoded_token = jwt.decode(token)
+
+        const api_response = await user.get_user(decoded_token.data.nik);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+
+        const index_current_user = participants.findIndex(participant => participant.id_participant === decoded_token.data.nik);
+
+        const allowed_user_type = ['Host', 'Notulis'];
+
+        if (!allowed_user_type.includes(participants[index_current_user].participant_type)) return helper.http_response(null, 'error', 'current user was not Host or Notulis', 401);
+
+        try {
+            const update_query = 'UPDATE meeting_participant SET attendance = ? WHERE id_participant = ?';
+            let participant_query = [];
+            let participant_value = [];
+
+            participants.forEach((participant) => {
+                participant_query.push(update_query);
+                participant_value.push(participant.attendance ? 1 : 0);
+                participant_value.push(participant.id_participant)
+            });
+            participant_query = participant_query.join(';');
+            await pool.query(participant_query, participant_value);
+
+            return helper.http_response(null, 'success', 'success update participants attendace');
+        } catch (err) {
+            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
+        }
+
     }
 }
