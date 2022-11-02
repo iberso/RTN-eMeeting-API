@@ -3,6 +3,7 @@ const user = require('./user');
 const room = require('./room');
 const pool = require('../database');
 const uuid = require('uuid');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     async get_user_meeting_by_date(nik, selected_date) {
