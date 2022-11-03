@@ -327,5 +327,13 @@ module.exports = {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
         }
 
+    },
+    async get_meeting_participants_details(id_meeting) {
+        try {
+            const data = await pool.query('SELECT u.nik, u.email_address,u.device_token FROM user u JOIN meeting_participant mp ON u.nik = mp.id_participant WHERE mp.id_meeting = ?', [id_meeting]);
+            return data;
+        } catch (err) {
+            console.log(err)
+        }
     }
 }

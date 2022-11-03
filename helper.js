@@ -202,8 +202,9 @@ module.exports = {
         });
 
         const meeting_topic = meeting.topic;
-        const meeting_date = '<strong>' + moment(meeting.date).format('dddd, Do MMMM YYYY') + " " + meeting.time_start + " - " + meeting.time_end + '</strong>';
+        const meeting_date = moment(meeting.date).format('dddd, Do MMMM YYYY');
         const meeting_location = meeting.type + " " + (meeting.type != 'Online') ? meeting.room.room_name : "" + " " + (meeting.type != 'Onsite') ? meeting.meeting_link : "";
+        const meeting_time = meeting.time_start + " - " + meeting.time_end;
 
         meeting.participants.forEach(function(to, i, array) {
             const current_user = to.id_participant;
@@ -214,7 +215,7 @@ module.exports = {
                     address: process.env['EMAIL_ADDRESS']
                 },
                 subject: 'Meeting Invitation: ' + meeting.topic,
-                html: mustache.render(template, { meeting_topic, meeting_date, current_user, meeting_location }),
+                html: mustache.render(template, { meeting_topic, meeting_date, current_user, meeting_location, meeting_time }),
                 attachments: [{
                     filename: 'logo_rutan.png',
                     path: './assets/images/logo_rutan.png',

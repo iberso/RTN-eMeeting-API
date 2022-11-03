@@ -172,7 +172,20 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
         }
     },
-
+    async set_user_device_token(req) {
+        const token = helper.get_token_from_headers(req);
+        const decoded_token = jwt.decode(token, process.env['JWT_SECRET_KEY']);
+        const user = decoded_token.data;
+        const user_device_token = req.body.device_token;
+        try {
+            const query = 'UPDATE user SET device_token = ? WHERE nik = ?';
+            const value = [user_device_token, user.nik];
+            await pool.query(query, value);
+            return helper.http_response(null, 'success', null);
+        } catch (err) {
+            return helper.http_response(null, 'error', "Database error occurredd: " + err, 500);
+        }
+    },
     async logout_user(req) {
         let token = helper.get_token_from_headers(req);
         if (helper.check_token(token)) {

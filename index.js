@@ -65,8 +65,9 @@ app.get('/api', async(req, res) => {
     res.status(200).send({ "Status": "success", "message": "Server, Halooooo" });
 })
 
-//User Services
+const url_prefix = process.env['URL_PREFIX'];
 
+//User Servicesc
 app.get('/api/user', middleware.check_authorization, async(req, res) => {
     let response = await user.get_user(null, req);
     res.status(response.status_code).send(response.body);
@@ -81,6 +82,11 @@ app.post('/api/user/login', middleware.check_login, async(req, res) => {
     let response = await user.login_user(req.body);
     res.status(response.status_code).send(response.body)
 })
+
+app.put('/api/user/device_token', middleware.check_authorization, async(req, res) => {
+    const response = await user.set_user_device_token(req);
+    res.status(response.status_code).send(response.body);
+});
 
 app.post('/api/user', async(req, res) => {
     let response = await user.add_user(req.body);
