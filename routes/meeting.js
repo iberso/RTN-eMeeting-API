@@ -4,8 +4,19 @@ const room = require('./room');
 const pool = require('../database');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
+const Moment = require('moment');
 
 module.exports = {
+    async get_all_meeting() {
+        try {
+            const date = new Date();
+            const todayDate = Moment(date).format('YYYY-MM-DD');
+            const data = await pool.query('SELECT id,time_start,notification_type FROM meeting WHERE date = ?', [todayDate]);
+            return data;
+        } catch (err) {
+            console.log(err);
+        }
+    },
     async get_user_meeting_by_date(nik, selected_date) {
         if (!nik) return helper.http_response(null, 'error', 'nik is not present', 400);
         if (!selected_date) return helper.http_response(null, 'error', 'selected_date is not present', 400);

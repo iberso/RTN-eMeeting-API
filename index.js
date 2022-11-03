@@ -2,6 +2,7 @@ const user = require('./routes/user');
 const meeting = require('./routes/meeting');
 const room = require('./routes/room');
 const Document = require('./routes/document');
+const Notification = require('./routes/notification');
 const path = require("path");
 const fs = require('fs');
 
@@ -31,7 +32,6 @@ const upload = multer({
 }).single('profile_photo');
 
 const portServer = process.env['PORT'];
-const portWebSocket = process.env['PORT_WS'];
 
 const express = require('express');
 const app = express();
@@ -67,7 +67,6 @@ app.get('/api', async(req, res) => {
 
 //User Services
 
-//DONE
 app.get('/api/user', middleware.check_authorization, async(req, res) => {
     let response = await user.get_user(null, req);
     res.status(response.status_code).send(response.body);
@@ -78,43 +77,36 @@ app.get('/api/users', middleware.check_authorization, async(req, res) => {
     res.status(response.status_code).send(response.body);
 })
 
-//DONE
 app.post('/api/user/login', middleware.check_login, async(req, res) => {
     let response = await user.login_user(req.body);
     res.status(response.status_code).send(response.body)
 })
 
-//DONE
 app.post('/api/user', async(req, res) => {
     let response = await user.add_user(req.body);
     res.status(response.status_code).send(response.body);
 })
 
-//DONE
 app.post('/api/user/logout', middleware.check_authorization, async(req, res) => {
     let response = await user.logout_user(req);
     res.status(response.status_code).send(response.body);
 })
 
-//DONE
 app.put('/api/user', middleware.check_authorization, async(req, res) => {
     let response = await user.edit_user(req);
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.put('/api/user/reset-password/:token', async(req, res) => {
     let response = await user.change_password(req.params.token, req.body);
     res.status(response.status_code).send(response.body);
 })
 
-//DONE
 app.post('/api/user/request-change-password', async(req, res) => {
     let response = await user.request_change_password(req.body);
     res.status(response.status_code).send(response.body);
 });
-// middleware.check_authorization,
-//DONE
+
 app.put('/api/user/:nik/profile', async(req, res) => {
     upload(req, res, async(err) => {
         if (err) {
@@ -141,7 +133,6 @@ app.put('/api/user/:nik/role', async(req, res) => {
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.get("/api/user/:nik/profile", async(req, res) => {
     const response = await user.get_user_profile(req.params.nik);
     if (response.status_code === 200) {
@@ -153,19 +144,16 @@ app.get("/api/user/:nik/profile", async(req, res) => {
 
 // Meeting Services
 
-//DONE
 app.get('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
     let response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.put('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
     let response = await meeting.edit_meeting(req.body, req.params.meeting_id);
     res.status(response.status_code).send(response.body);
 });
 
-//ON GOING
 app.put('/api/meeting/:meeting_id/approval', middleware.check_authorization, async(req, res) => {
     const response = await Document.approve_document(req.params.meeting_id, req.body.user_id, req.body.approval_status);
     res.status(response.status_code).send(response.body);
@@ -176,13 +164,11 @@ app.put('/api/meeting/:meeting_id/attendance', middleware.check_authorization, a
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.post('/api/meeting', middleware.check_authorization, async(req, res) => {
     let response = await meeting.add_meeting(req.body);
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.get('/api/meeting/user/:nik', middleware.check_authorization, async(req, res) => {
     if (req.query.date) {
         let response = await meeting.get_user_meeting_by_date(req.params.nik, req.query.date);
@@ -196,35 +182,28 @@ app.get('/api/meeting/user/:nik', middleware.check_authorization, async(req, res
     }
 });
 
-//DONE
 app.post('/api/meeting/users', middleware.check_authorization, async(req, res) => {
-    let response = await meeting.get_all_users(req.body);
+    const response = await meeting.get_all_users(req.body);
     res.status(response.status_code).send(response.body);
 });
 
-//TODO : EDIT MEETING
-
 // Room Services
 
-//DONE
 app.post('/api/room', middleware.check_authorization, async(req, res) => {
     let response = await room.add_room(req.body);
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.get('/api/room/:id_room', middleware.check_authorization, async(req, res) => {
     let response = await room.get_room_by_id(req.params.id_room);
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.put('/api/room/:id_room', middleware.check_authorization, async(req, res) => {
     let response = await room.edit_room(req.body.room_name, req.params.id_room);
     res.status(response.status_code).send(response.body);
 });
 
-//DONE
 app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
     let response = await room.get_all_room_by_status(req.body);
     res.status(response.status_code).send(response.body);
@@ -294,6 +273,8 @@ io.on("connection", function(socket) {
         console.log("Users disconnected : " + socket.id);
     });
 });
+
+Notification.start_cron_scheduler();
 
 server.listen(portServer, function() {
     console.log(`Rest API listening at ${portServer}`)
