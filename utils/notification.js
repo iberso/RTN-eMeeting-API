@@ -39,6 +39,7 @@ module.exports = {
         today_meeting.forEach(async meeting => {
             const time_reminder = Moment(Moment(todayDate + " " + meeting.time_start).subtract(meeting_setting.reminder_before, 'minute')).format("hh:mm:ss");
             const time_now = Moment(date).format('hh:mm:ss');
+            console.log(time_now);
             if (time_reminder === time_now) {
                 console.log("Send notif to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
