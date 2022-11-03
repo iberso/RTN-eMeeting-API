@@ -55,7 +55,7 @@ module.exports = {
         const meeting_user_data = await Meeting.get_meeting_participants_details(meeting.id);
 
         meeting_user_data.forEach((user) => {
-            if (user.device_token != null || user.device_token != "") {
+            if (user.device_token != null && user.device_token != "") {
                 const payload = {
                     "notification": {
                         "title": '📢' + " MEETING REMINDER",
