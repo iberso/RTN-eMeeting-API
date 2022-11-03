@@ -32,6 +32,8 @@ module.exports = {
 
         const date = new Date();
         const todayDate = Moment(date).format('YYYY-MM-DD');
+
+        console.log(todayDate);
         const meeting_setting = JSON.parse(await this.get_meeting_setting());
 
         today_meeting.forEach(async meeting => {
