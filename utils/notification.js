@@ -27,12 +27,16 @@ module.exports = {
         const todayDate = Moment(date).format('YYYY-MM-DD');
         const meeting_setting = JSON.parse(await this.get_meeting_setting());
 
-        today_meeting.forEach(meeting => {
+        today_meeting.forEach(async meeting => {
             const time_reminder = Moment(Moment(todayDate + " " + meeting.time_start).subtract(meeting_setting.reminder_before, 'minute')).format("hh:mm:ss");
             console.log(time_reminder);
             const time_now = Moment(date).format('hh:mm:ss');
             if (time_reminder === time_now) {
                 console.log("Send notif to " + meeting.id);
+                if (meeting.notification_type === 'Email') {
+                    const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
+                    await helper.send_mail_new_meeting(api_response.body.data);
+                } else if (meeting.notification_type === 'Push Notification') {}
             }
         });
     }
