@@ -28,11 +28,8 @@ module.exports = {
         }
     },
     async send_meeting_notification(today_meeting) {
-        console.log(today_meeting);
-
         const date = new Date();
         const todayDate = Moment(date).tz("Asia/Jakarta").format('YYYY-MM-DD');
-        console.log("time diff " + date.getTimezoneOffset());
         console.log(todayDate);
         const meeting_setting = JSON.parse(await this.get_meeting_setting());
 
