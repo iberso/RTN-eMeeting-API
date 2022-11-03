@@ -2,7 +2,7 @@ const user = require('./routes/user');
 const meeting = require('./routes/meeting');
 const room = require('./routes/room');
 const Document = require('./routes/document');
-const Notification = require('./routes/notification');
+const Notification = require('./utils/notification');
 const path = require("path");
 const fs = require('fs');
 
