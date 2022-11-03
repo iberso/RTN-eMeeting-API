@@ -2,7 +2,7 @@ const Cron = require('node-cron');
 const Meeting = require('../routes/meeting')
 const Path = require('path');
 const Fs = require('fs')
-const Moment = require('moment');
+const Moment = require('moment-timezone');
 const Helper = require("../helper");
 
 // import { admin } from './firebase-config';

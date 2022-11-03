@@ -4,7 +4,7 @@ const room = require('./room');
 const pool = require('../database');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
-const Moment = require('moment');
+const Moment = require('moment-timezone');
 
 module.exports = {
     async get_all_meeting() {

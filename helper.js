@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const mustache = require('mustache');
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 require('dotenv').config();
 
