@@ -13,7 +13,6 @@ module.exports = {
     start_cron_scheduler() {
         const scheduler_notification_before = Cron.schedule("* * * * *", async() => {
             const response = await Meeting.get_all_meeting();
-            console.log("asdasd");
             this.send_meeting_notification(response);
         })
         const scheduler_notification_meeting_start = 1;
@@ -53,7 +52,7 @@ module.exports = {
         const meeting_user_data = await Meeting.get_meeting_participants_details(meeting.id);
 
         meeting_user_data.forEach((user) => {
-            if (user.device_token != null) {
+            if (user.device_token != null || user.device_token != "") {
                 const payload = {
                     "notification": {
                         "title": '📢' + " MEETING REMINDER",
