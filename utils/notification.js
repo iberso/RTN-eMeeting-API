@@ -3,14 +3,18 @@ const Meeting = require('../routes/meeting')
 const Path = require('path');
 const Fs = require('fs')
 const Moment = require('moment');
+const Helper = require("../helper");
 
 module.exports = {
     start_cron_scheduler() {
-        Cron.schedule("* * * * *", async() => {
+        const scheduler_notification_before = Cron.schedule("* * * * *", async() => {
             const response = await Meeting.get_all_meeting();
             console.log("asdasd");
             this.send_meeting_notification(response);
         })
+        const scheduler_notification_meeting_start = 1;
+
+        scheduler_notification_before.start();
     },
     async get_meeting_setting() {
         try {
@@ -35,7 +39,7 @@ module.exports = {
                 console.log("Send notif to " + meeting.id);
                 if (meeting.notification_type === 'Email') {
                     const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
-                    await helper.send_mail_new_meeting(api_response.body.data);
+                    await Helper.send_mail_new_meeting(api_response.body.data);
                 } else if (meeting.notification_type === 'Push Notification') {}
             }
         });
