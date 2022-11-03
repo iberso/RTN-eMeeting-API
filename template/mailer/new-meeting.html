@@ -16,16 +16,16 @@
     <table style="width:100%;background-color: white;border-radius: 10px; border: solid #aaaaaa 1px; margin-left: auto;margin-right: auto;">
         <tr>
             <td>
-                <table style="font-size: 11pt; margin: 20px; width: 96%;">
+                <table style="border-top-left-radius: 10px; border-top-right-radius: 10px;width:100%;height:200px;text-align: center; background-image: url(../../assets/images/subtle-prism.png);  background-size: cover;background-position: center;background-repeat: no-repeat;">
                     <tr>
                         <td colspan="3" style="text-align: center;"><img src="cid:logo_rutan" alt="logo PT. RUTAN" width="80px"></td>
                     </tr>
                     <tr>
-                        <td colspan="3" style="font-size: 18pt; font-weight: bold; text-align: center;">RUTAN | E-MEETING </td>
+                        <td colspan="3" style="font-size: 20pt; font-weight: bold; text-align: center;color:white;">RUTAN | E-MEETING </td>
                     </tr>
-                    <tr>
-                        <td style="padding-top: 20px;"></td>
-                    </tr>
+                </table>
+
+                <table style="font-size: 11pt; margin: 20px; width: 96%;">
                     <tr>
                         <td colspan="3" style="font-weight: bold; font-size: 13pt;">Hi, {{current_user}}</td>
                     </tr>
@@ -36,7 +36,7 @@
                         <td colspan="3">You've been invited to attend <span style="font-weight: bold;">'{{meeting_topic}}'</span>.</td>
                     </tr>
                     <tr>
-                        <td style="padding-top: 30px;"></td>
+                        <td style="padding-top: 15px;"></td>
                     </tr>
                     <tr>
                         <td>
@@ -51,6 +51,16 @@
                         <td>
                             <span style="font-weight: bold;">Date</span><br>
                             <span>{{meeting_date}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 10px;"></td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <span style="font-weight: bold;">Time</span><br>
+                            <span>{{meeting_time}}</span>
                         </td>
                     </tr>
                     <tr>

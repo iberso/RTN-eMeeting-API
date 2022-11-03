@@ -219,6 +219,10 @@ module.exports = {
                     filename: 'logo_rutan.png',
                     path: './assets/images/logo_rutan.png',
                     cid: 'logo_rutan'
+                }, {
+                    filename: 'subtle-prism.png',
+                    path: './assets/images/subtle-prism.png',
+                    cid: 'bg_header'
                 }]
             }
             console.log(to.email_address);
