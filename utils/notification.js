@@ -64,7 +64,7 @@ module.exports = {
                     "priority": "high"
                 }
                 admin.messaging().sendToDevice(user.device_token, payload, notif_options).then((response) => {
-
+                    console.log("success send notif to " + user.nik);
                 }).catch((err) => {
                     console.log(err.errorInfo.message);
                 })
