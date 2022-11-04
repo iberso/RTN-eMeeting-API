@@ -4,8 +4,6 @@ const Path = require('path');
 const Fs = require('fs')
 const Moment = require('moment-timezone');
 const Helper = require("../helper");
-
-// import { admin } from './firebase-config';
 const firebase = require('./firebase-config')
 const admin = firebase.admin;
 
@@ -15,7 +13,10 @@ module.exports = {
             const response = await Meeting.get_all_meeting();
             this.send_meeting_notification(response);
         })
-        const scheduler_notification_meeting_start = 1;
+        const scheduler_notification_meeting_start = Cron.schedule("* * * * *", async() => {
+            const response = await Meeting.get_all_meeting();
+            this.send_meeting_start_notification(response);
+        });
 
         scheduler_notification_before.start();
     },
@@ -27,10 +28,23 @@ module.exports = {
             console.log(err);
         }
     },
+    async send_meeting_start_notification(today_meeting) {
+        const date = new Date();
+        today_meeting.forEach(async meeting => {
+            const time_now = Moment(date).tz("Asia/Jakarta").format('hh:mm:ss');
+            if (meeting.time_start === time_now) {
+                console.log("Send meeting start to " + meeting.id);
+                const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
+                if (meeting.notification_type === 'Push Notification') {
+                    const current_meeting = api_response.body.data;
+                    await this.send_push_notification(current_meeting.id, '📢' + " MEETING REMINDER", current_meeting.topic + " is starting now");
+                }
+            }
+        });
+    },
     async send_meeting_notification(today_meeting) {
         const date = new Date();
         const todayDate = Moment(date).tz("Asia/Jakarta").format('YYYY-MM-DD');
-        console.log(todayDate);
         const meeting_setting = JSON.parse(await this.get_meeting_setting());
 
         today_meeting.forEach(async meeting => {
@@ -38,25 +52,25 @@ module.exports = {
             const time_now = Moment(date).tz("Asia/Jakarta").format('hh:mm:ss');
             console.log(time_now);
             if (time_reminder === time_now) {
-                console.log("Send notif to " + meeting.id);
+                console.log("Send notif reminder to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
                 if (meeting.notification_type === 'Email') {
                     await Helper.send_mail_new_meeting(api_response.body.data);
                 } else if (meeting.notification_type === 'Push Notification') {
-                    await this.send_push_notification(api_response.body.data);
+                    const current_meeting = api_response.body.data;
+                    await this.send_push_notification(current_meeting.id, '📢' + " MEETING REMINDER", "Start at " + current_meeting.time_start + " | " + current_meeting.topic);
                 }
             }
         });
     },
-    async send_push_notification(meeting) {
-        const meeting_user_data = await Meeting.get_meeting_participants_details(meeting.id);
-
+    async send_push_notification(meeting_id, title, body) {
+        const meeting_user_data = await Meeting.get_meeting_participants_details(meeting_id);
         meeting_user_data.forEach((user) => {
             if (user.device_token != null && user.device_token != "") {
                 const payload = {
                     "notification": {
-                        "title": '📢' + " MEETING REMINDER",
-                        "body": "Start at " + meeting.time_start + " | " + meeting.topic
+                        "title": title,
+                        "body": body
                     }
                 }
                 const notif_options = {
