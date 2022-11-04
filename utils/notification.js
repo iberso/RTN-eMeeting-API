@@ -58,7 +58,7 @@ module.exports = {
                     await Helper.send_mail_new_meeting(api_response.body.data);
                 } else if (meeting.notification_type === 'Push Notification') {
                     const current_meeting = api_response.body.data;
-                    await this.send_push_notification(current_meeting.id, '📢' + " MEETING REMINDER", current_meeting.topic + "Starts at " + current_meeting.time_start);
+                    await this.send_push_notification(current_meeting.id, '📢' + " MEETING REMINDER", current_meeting.topic + " starts at " + current_meeting.time_start);
                 }
             }
         });
