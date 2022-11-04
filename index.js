@@ -280,7 +280,7 @@ io.on("connection", function(socket) {
     });
 });
 
-// Notification.start_cron_scheduler();
+Notification.start_cron_scheduler();
 
 server.listen(portServer, function() {
     console.log(`Rest API listening at ${portServer}`)
