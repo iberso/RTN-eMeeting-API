@@ -91,7 +91,6 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-
     async get_roles() {
         try {
             const data = await pool.query('SELECT * FROM role');
@@ -104,38 +103,44 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
+    async check_user_email_address(email_address) {
+        if (!email_address) return;
+        try {
+            const data = await pool.query('SELECT * FROM user WHERE email_address = ?', [email_address.trim()]);
+            if (data.length == 0) {
+                return helper.http_response(null, 'error', 'email address not found', 404);
+            } else {
+                return helper.http_response(null, 'success', null);
+            }
+        } catch (err) {
+            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500);
+        }
+    },
+    async add_user(req) {
+        const user = req.body;
 
-    async add_user(user) {
         if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
         if (!user.email_address) return helper.http_response(null, 'error', 'email address is not present in body', 400);
 
-        let api_response = await this.get_user(user.nik);
-        if (api_response.status_code === 200) return helper.http_response(null, 'error', 'User already exist', 400);
+        const api_response = await this.get_user(user.nik);
+        if (api_response.status_code === 200) return helper.http_response(null, 'error', 'user already exist', 400);
 
-        let default_password = Math.floor(100000 + Math.random() * 900000).toString();
+        const api_response_check_email = await this.check_user_email_address(user.email_address);
+        if (api_response_check_email.status_code === 200) return helper.http_response(null, 'error', 'email address already in use by another user', 400);
 
+        const default_password = Math.floor(100000 + Math.random() * 900000).toString();
         const hash_password = await bcrypt.hash(default_password, 10);
-
-        let sql = 'INSERT INTO user (nik,email_address,password) VALUES (?,?,?)';
-        let value = [
-            user.nik,
-            user.email_address,
-            hash_password
-        ];
+        const sql = 'INSERT INTO user (nik,email_address,password) VALUES (?,?,?)';
+        const value = [user.nik, user.email_address, hash_password];
 
         try {
             await pool.query(sql, value);
-            data = {
-                'nik': user.nik,
-                'email_address': user.email_address,
-            }
-            helper.send_mail(user.email_address, "Your account has been registered", default_password, user.email_address);
-            return helper.http_response(data, 'success', "Account created successfully!", 201);
+            helper.send_mail(user.email_address, "your account has been registered", default_password, user.email_address);
+            return helper.http_response(null, 'success', "account created successfully", 201);
         } catch (err) {
-            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
+            return helper.http_response(null, 'error', "database error occurred: " + err.message, 500);
         }
     },
-
     async login_user(user) {
         if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
         if (!user.password) return helper.http_response(null, 'error', 'password is not present in body', 400);

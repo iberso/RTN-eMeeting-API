@@ -96,11 +96,7 @@
 ```json
 {
     "status": "success",
-    "message": "Account created successfully!",
-    "data": {
-        "nik": 123456,
-        "email_address": "loremipsum@example.com"
-    }
+    "message": "account created successfully",
 }
 ```
 *) default user password will be send into registered `email_address`
@@ -110,17 +106,16 @@
 ```json
 {
     "status": "error",
-    "message": "User already exist"
+    "message": "user already exist"
 }
 ```
-#### Request: User account registration (one of the bodies is not present)
+#### Request: User account registration (email address taken by another user)
 ![Bad Request](https://badgen.net/badge/Bad%20Request/400/red)
 
 ```json
-// example : email_address
 {
     "status": "error",
-    "message": "email_address is not present in body"
+    "message": "email address already in use by another user"
 }
 ```
 

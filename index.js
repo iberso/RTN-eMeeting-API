@@ -89,7 +89,7 @@ app.put('/api/user/device_token', middleware.check_authorization, async(req, res
 });
 
 app.post('/api/user', async(req, res) => {
-    let response = await user.add_user(req.body);
+    let response = await user.add_user(req);
     res.status(response.status_code).send(response.body);
 })
 
@@ -151,12 +151,12 @@ app.get("/api/user/:nik/profile", async(req, res) => {
 // Meeting Services
 
 app.get('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
-    let response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
+    const response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
     res.status(response.status_code).send(response.body);
 });
 
 app.put('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
-    let response = await meeting.edit_meeting(req.body, req.params.meeting_id);
+    const response = await meeting.edit_meeting(req.body, req.params.meeting_id);
     res.status(response.status_code).send(response.body);
 });
 
@@ -171,7 +171,7 @@ app.put('/api/meeting/:meeting_id/attendance', middleware.check_authorization, a
 });
 
 app.post('/api/meeting', middleware.check_authorization, async(req, res) => {
-    let response = await meeting.add_meeting(req.body);
+    const response = await meeting.add_meeting(req);
     res.status(response.status_code).send(response.body);
 });
 
@@ -211,7 +211,7 @@ app.put('/api/room/:id_room', middleware.check_authorization, async(req, res) =>
 });
 
 app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
-    let response = await room.get_all_room_by_status(req.body);
+    const response = await room.get_all_room_by_status(req.body);
     res.status(response.status_code).send(response.body);
 });
 

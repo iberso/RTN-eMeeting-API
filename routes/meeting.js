@@ -73,19 +73,19 @@ module.exports = {
         }
     },
     async get_meeting_by_meeting_id(id_meeting) {
+
         if (!id_meeting) return helper.http_response(null, 'error', 'id_meeting is not present', 400);
 
-        let meeting_query = 'SELECT id,topic,description,DATE_FORMAT(time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,date,id_room,meeting_link,type,notification_type FROM meeting WHERE id = ?';
-        let meeting_query_values = [id_meeting];
+        const meeting_query = 'SELECT id,topic,description,DATE_FORMAT(time_start,"%H:%i") AS time_start,DATE_FORMAT(time_end,"%H:%i") AS time_end,date,id_room,meeting_link,type,notification_type FROM meeting WHERE id = ?';
+        const meeting_query_values = [id_meeting];
 
         try {
-            let meeting_detail = await pool.query(meeting_query, meeting_query_values);
+            const meeting_detail = await pool.query(meeting_query, meeting_query_values);
             if (meeting_detail.length != 0) {
-                // let participants_query = 'SELECT id_participant,participant_type,IF(approve_notulensi = 1,"true","false") AS approve_notulensi,IF(attendance = 1,"true","false") AS attendance FROM meeting_participant WHERE id_meeting = ? ORDER BY participant_type ASC';
                 const participants_query = 'SELECT id_participant, participant_type, approval_status, IF(attendance = 1,"true","false") AS attendance FROM meeting_participant WHERE id_meeting = ? ORDER BY participant_type ASC';
 
-                let participants_query_values = [id_meeting];
-                let participants_data = await pool.query(participants_query, participants_query_values);
+                const participants_query_values = [id_meeting];
+                const participants_data = await pool.query(participants_query, participants_query_values);
 
                 //untuk mengambil semua data user
                 const api_response_get_participant = await user.get_all_users();
@@ -103,13 +103,12 @@ module.exports = {
                         'data': null
                     }
                 }
-
                 if (meeting_detail[0].type != 'Online') {
                     api_response = await room.get_room_by_id(meeting_detail[0].id_room);
                     if (api_response.status_code === 404) return helper.http_response(null, 'error', 'Room not found', 404);
                 }
 
-                let meeting = {
+                const meeting = {
                     id: meeting_detail[0].id,
                     topic: meeting_detail[0].topic,
                     description: meeting_detail[0].description,
@@ -130,45 +129,59 @@ module.exports = {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
     },
-    async add_meeting(meeting) {
-        if (!meeting.topic) return helper.http_response(null, 'error', 'topic is not present in body', 400);
-        if (!meeting.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
-        if (!meeting.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
-        if (!meeting.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
-        if (!meeting.type) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
-        if (!meeting.notification_type) return helper.http_response(null, 'error', 'notification_type is not present in body', 400);
+    async add_meeting(req) {
+        let meeting = req.body;
 
-        if (!helper.is_time_format(meeting.time_start)) return helper.http_response(null, 'error', 'time_start is not in HH:mm format', 400);
-        if (!helper.is_time_format(meeting.time_end)) return helper.http_response(null, 'error', 'time_end is not in HH:mm format', 400);
+        if (!meeting.topic) return helper.http_response(null, 'error', 'topic is not present in body', 400);
+        meeting.topic = meeting.topic.trim();
+
+        if (!meeting.time_start) return helper.http_response(null, 'error', 'time_start is not present in body', 400);
+        meeting.time_start = meeting.time_start.trim();
+
+        if (!meeting.time_end) return helper.http_response(null, 'error', 'time_end is not present in body', 400);
+        meeting.time_end = meeting.time_end.trim();
+
+        if (!meeting.date) return helper.http_response(null, 'error', 'date is not present in body', 400);
+        meeting.date = meeting.date.trim();
+
+        if (!meeting.type) return helper.http_response(null, 'error', 'type is not present in body', 400);
+        meeting.type = meeting.type.trim();
+
+        if (!meeting.notification_type) return helper.http_response(null, 'error', 'notification_type is not present in body', 400);
+        meeting.notification_type = meeting.notification_type.trim();
 
         const uuid_meeting = uuid.v4();
+
         let meeting_query_key = ['id', 'topic', 'time_start', 'time_end', 'date', 'type', 'notification_type'];
         let meeting_values = [uuid_meeting, meeting.topic, meeting.time_start, meeting.time_end, meeting.date, meeting.type, meeting.notification_type];
 
         if (meeting.description) {
             meeting_query_key.push('description');
+            meeting.description = meeting.description.trim();
             meeting_values.push(meeting.description);
         }
 
         if (meeting.type === 'Online') {
             if (!meeting.meeting_link) return helper.http_response(null, 'error', 'meeting_link is not present in body', 400);
             meeting_query_key.push('meeting_link');
+            meeting.meeting_link = meeting.meeting_link.trim();
             meeting_values.push(meeting.meeting_link);
         } else if (meeting.type === 'Onsite') {
             if (!meeting.id_room) return helper.http_response(null, 'error', 'id_room is not present in body', 400);
             meeting_query_key.push('id_room');
             meeting_values.push(meeting.id_room);
-        } else if (meeting.type === 'Hybird') {
+        } else if (meeting.type === 'Hybrid') {
             if (!meeting.meeting_link && !meeting.id_room) return helper.http_response(null, 'error', 'meeting_link and id_room is not present in body', 400);
             meeting_query_key.push('id_room');
             meeting_values.push(meeting.id_room);
             meeting_query_key.push('meeting_link');
+            meeting.meeting_link = meeting.meeting_link.trim();
             meeting_values.push(meeting.meeting_link);
         } else {
-            return helper.http_response(null, 'error', 'meeting_type is not valid, meeting_type must be in ["Online","Onsite","Hybird"]', 400);
+            return helper.http_response(null, 'error', 'meeting_type is not valid, meeting_type must be in ["Online","Onsite","Hybrid"]', 400);
         }
 
-        let notif_type = ['Email', 'Push Notification'];
+        const notif_type = ['Email', 'Push Notification'];
         if (!(notif_type.includes(meeting.notification_type))) {
             return helper.http_response(null, 'error', 'notification_type is not valid, notification_type must be in ["Email", "Push Notification"]', 400);
         }
@@ -176,6 +189,7 @@ module.exports = {
         let meeting_query = 'INSERT INTO meeting (' + meeting_query_key.join(',') + ') VALUES (' + helper.generate_values_placeholder(meeting_query_key) + ')';
 
         if (!meeting.participants) return helper.http_response(null, 'error', 'participants is not present in body', 400);
+
         try {
             await pool.query(meeting_query, meeting_values);
             try {
@@ -184,11 +198,12 @@ module.exports = {
                 await pool.query(query, values);
 
                 const api_response = await this.get_meeting_by_meeting_id(uuid_meeting);
-                await helper.send_mail_new_meeting(api_response.body.data);
+                // await helper.send_mail_new_meeting(api_response.body.data);
+                //pengecekan type meeting
 
                 return helper.http_response(null, 'success', "meeting created successfully", 201);
             } catch (err) {
-                return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
+                return helper.http_response(null, 'error', "database error occurredd: " + err.message, 500)
             }
         } catch (err) {
             return helper.http_response(null, 'error', "database error occurred: " + err.message, 500)
@@ -227,14 +242,14 @@ module.exports = {
             if (!meeting.id_room) return helper.http_response(null, 'error', 'id_room is not present in body', 400);
             meeting_query_key.push('id_room = ?');
             meeting_values.push(meeting.id_room);
-        } else if (meeting.type === 'Hybird') {
+        } else if (meeting.type === 'Hybrid') {
             if (!meeting.meeting_link && !meeting.id_room) return helper.http_response(null, 'error', 'meeting_link and id_room is not present in body', 400);
             meeting_query_key.push('id_room = ?');
             meeting_values.push(meeting.id_room);
             meeting_query_key.push('meeting_link = ?');
             meeting_values.push(meeting.meeting_link);
         } else {
-            return helper.http_response(null, 'error', 'meeting_type is not valid, meeting_type must be in ["Online","Onsite","Hybird"]', 400);
+            return helper.http_response(null, 'error', 'meeting_type is not valid, meeting_type must be in ["Online","Onsite","Hybrid"]', 400);
         }
 
         const notif_type = ['Email', 'Push Notification'];
