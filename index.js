@@ -3,6 +3,7 @@ const meeting = require('./routes/meeting');
 const room = require('./routes/room');
 const Document = require('./routes/document');
 const Notification = require('./utils/notification');
+const Settings = require('./utils/meeting-general-settings');
 const path = require("path");
 const fs = require('fs');
 
@@ -245,6 +246,16 @@ app.get('/api/reset-password-check/:token', async(req, res) => {
     res.status(response.status_code).send(response.body);
 });
 
+app.get('/api/settings', middleware.check_authorization, async(req, res) => {
+    const response = await Settings.get_meeting_general_settings();
+    res.status(response.status_code).send(response.body);
+})
+
+app.put('/api/settings', middleware.check_authorization, async(req, res) => {
+    const response = await Settings.set_meeting_general_settings(req);
+    res.status(response.status_code).send(response.body);
+})
+
 io.on("connection", function(socket) {
     console.log('===============================')
     console.log("Users Connected : " + socket.id);
@@ -257,8 +268,6 @@ io.on("connection", function(socket) {
 
         socket.on('send-changes', function(delta) {
             socket.to(meeting_id).emit('receive-changes', delta);
-
-            // socket.broadcast.to(meeting_id).emit('receive-changes', delta);
         });
 
         socket.on('save-document', async function(data) {
@@ -280,7 +289,7 @@ io.on("connection", function(socket) {
     });
 });
 
-Notification.start_cron_scheduler();
+// Notification.start_cron_scheduler();
 
 server.listen(portServer, function() {
     console.log(`Rest API listening at ${portServer}`)

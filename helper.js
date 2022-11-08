@@ -17,7 +17,7 @@ module.exports = {
             if (err.message === 'jwt expired') {
                 return this.http_response(null, 'error', 'token expired', 401);
             } else {
-                return this.http_response(null, 'error', 'invalid token', 401)
+                return this.http_response(null, 'error', 'token invalid', 401)
             }
         }
     },
@@ -27,14 +27,13 @@ module.exports = {
             let result = await jwt.verify(token, process.env['JWT_SECRET_KEY']);
             return this.http_response(result.data, 'success', 'token valid', 200)
         } catch (err) {
-            console.log(err);
             if (this.check_token(token)) {
                 this.remove_token(token);
             }
             if (err.message === 'jwt expired') {
                 return this.http_response(null, 'error', 'token expired', 401);
             } else {
-                return this.http_response(null, 'error', 'invalid token', 401)
+                return this.http_response(null, 'error', 'token invalid', 401)
             }
         }
     },
@@ -50,6 +49,7 @@ module.exports = {
                         parseInt(process.env['JWT_EXP_TIME_IN_SECONDS']),
                     data: decoded.data
                 }, process.env['JWT_SECRET_KEY'], { algorithm: 'HS256' });
+
                 this.add_token(new_token);
                 return this.http_response(null, 'success', null, 200, new_token);
             } else {

@@ -15,7 +15,7 @@ module.exports = {
     async get_meeting_general_settings() {
         try {
             const seetings = Fs.readFileSync(Path.join(__dirname, '..', '/files/general_settings.json'), 'utf8');
-            return helper.http_response(seetings, 'success', null);
+            return helper.http_response(JSON.parse(seetings), 'success', null);
         } catch (err) {
             return helper.http_response(null, 'error', "readfile error occurred: " + err.message, 500)
         }
