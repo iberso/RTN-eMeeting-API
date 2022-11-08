@@ -187,7 +187,8 @@ module.exports = {
         }
 
         let meeting_query = 'INSERT INTO meeting (' + meeting_query_key.join(',') + ') VALUES (' + helper.generate_values_placeholder(meeting_query_key) + ')';
-
+        console.log(meeting_query);
+        console.log(meeting_values);
         if (!meeting.participants) return helper.http_response(null, 'error', 'participants is not present in body', 400);
 
         try {
@@ -316,8 +317,6 @@ module.exports = {
 
         const allowed_user_type = ['Host', 'Notulis'];
 
-        console.log(participants[index_current_user].participant_type);
-
         if (!allowed_user_type.includes(participants[index_current_user].participant_type)) return helper.http_response(null, 'error', 'current user was not Host or Notulis', 401);
 
         try {
@@ -327,7 +326,7 @@ module.exports = {
 
             participants.forEach((participant) => {
                 participant_query.push(update_query);
-                participant_value.push(participant.attendance ? 1 : 0);
+                participant_value.push((participant.attendance === 'true') ? 1 : 0);
                 participant_value.push(participant.id_participant)
                 participant_value.push(id_meeting);
             });

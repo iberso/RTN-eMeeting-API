@@ -4,6 +4,7 @@ require('dotenv').config();
 
 let pool = mysql.createPool({
     connectionLimit: 100,
+    multipleStatements: true,
     host: process.env['DATABASE_HOST'],
     user: process.env['DATABASE_USER'],
     password: process.env['DATABASE_PASSWORD'],
@@ -13,6 +14,7 @@ let pool = mysql.createPool({
         'DATE',
         'DATETIME'
     ]
+
 });
 
 pool.getConnection((err, connection) => {
@@ -26,7 +28,6 @@ pool.getConnection((err, connection) => {
         if (err.code === 'ECONNREFUSED') {
             console.error('Database connection was refused.')
         }
-        console.log(err);
     }
 
     if (connection) connection.release();
