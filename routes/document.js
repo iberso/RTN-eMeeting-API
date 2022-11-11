@@ -66,7 +66,7 @@ module.exports = {
             const query = 'UPDATE meeting_participant set approval_status = ? WHERE id_meeting = ? AND id_participant = ?';
             const value = [approval_status, meeting_id, user_id];
             await pool.query(query, value);
-            return helper.http_response(null, 'success', 'approval status updated!');
+            return helper.http_response(null, 'success', 'approval status updated');
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }

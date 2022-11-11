@@ -14,14 +14,14 @@ module.exports = {
         const result = await pool.query(sql_user, value_user);
 
         if (result.length === 0) {
-            return helper.http_response(null, 'error', 'User not found', 404)
+            return helper.http_response(null, 'error', 'user not found', 404)
         }
 
         try {
             let sql = 'UPDATE user SET profile_picture_path = ? WHERE nik = ?';
             let value = [file_path, nik];
             await pool.query(sql, value);
-            return helper.http_response(null, 'success', 'User profile picture updated!');
+            return helper.http_response(null, 'success', 'user profile picture updated');
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
@@ -39,7 +39,7 @@ module.exports = {
                     return helper.http_response('assets/images/user.png', 'success', null);
                 }
             } else {
-                return helper.http_response(null, 'error', 'User not found', 404)
+                return helper.http_response(null, 'error', 'user not found', 404)
             }
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
@@ -72,20 +72,16 @@ module.exports = {
     async get_all_users() {
         try {
             const data = await pool.query('SELECT nik, email_address, profile_picture_path, device_token,id_role FROM user');
-
-            //untuk mengambil semua role
             const api_response = await this.get_roles();
             if (api_response.status_code === 404) return api_response;
-
             data.forEach(element => {
                 element.role = api_response.body.data[element.id_role];
                 delete element.id_role;
             });
-
             if (data.length != 0) {
                 return helper.http_response(data, 'success', null);
             } else {
-                return helper.http_response(null, 'error', 'Data User is empty', 404)
+                return helper.http_response(null, 'error', 'users is empty', 404)
             }
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
@@ -126,7 +122,7 @@ module.exports = {
         if (api_response.status_code === 200) return helper.http_response(null, 'error', 'user already exist', 400);
 
         const api_response_check_email = await this.check_user_email_address(user.email_address);
-        if (api_response_check_email.status_code === 200) return helper.http_response(null, 'error', 'email address already in use by another user', 400);
+        if (api_response_check_email.status_code === 200) return helper.http_response(null, 'error', 'email address already taken by another user', 400);
 
         const default_password = Math.floor(100000 + Math.random() * 900000).toString();
         const hash_password = await bcrypt.hash(default_password, 10);
@@ -146,7 +142,7 @@ module.exports = {
         if (!user.password) return helper.http_response(null, 'error', 'password is not present in body', 400);
 
         let api_response = await this.get_user(user.nik);
-        if (api_response.status_code != 200) return helper.http_response(null, 'error', 'User not found', 404);
+        if (api_response.status_code != 200) return helper.http_response(null, 'error', 'user not found', 404);
 
         let sql = 'SELECT * FROM user WHERE nik = ?'
         let value = [user.nik]
@@ -169,9 +165,9 @@ module.exports = {
                     data: res_data
                 }, process.env['JWT_SECRET_KEY'], { algorithm: 'HS256' });
                 helper.add_token(token)
-                return helper.http_response(null, 'success', "Successfully logged in", 200, token);
+                return helper.http_response(null, 'success', "successfully logged in", 200, token);
             } else {
-                return helper.http_response(null, 'Unauthorized', "Invalid Credentials (Wrong Password)", 401)
+                return helper.http_response(null, 'Unauthorized', "invalid credentials", 401)
             }
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
@@ -192,10 +188,10 @@ module.exports = {
         }
     },
     async logout_user(req) {
-        let token = helper.get_token_from_headers(req);
+        const token = helper.get_token_from_headers(req);
         if (helper.check_token(token)) {
             helper.remove_token(token);
-            return helper.http_response(null, 'success', 'User logged out successfully')
+            return helper.http_response(null, 'success', 'user logged out successfully')
         } else {
             return helper.http_response(null, 'error', 'token invalid', 401)
         }
@@ -214,14 +210,14 @@ module.exports = {
         const api_response_role = await this.get_roles();
         if (api_response_role.status_code === 404) return api_response_role;
 
-        if (!api_response_role.body.data[req.body.role_id]) return helper.http_response(null, 'error', 'role_id was not valid', 403);
+        if (!api_response_role.body.data[req.body.role_id]) return helper.http_response(null, 'error', 'role_id was not valid', 400);
 
         if (current_user.data.role.role_name === "Super Admin") {
             try {
                 const query = "UPDATE user SET id_role = ? WHERE nik = ?;"
                 const value = [req.body.role_id, req.params.nik];
                 await pool.query(query, value);
-                return helper.http_response(null, 'success', 'succes change user role', 200);
+                return helper.http_response(null, 'success', 'success change user role', 200);
             } catch (err) {
                 return helper.http_response(null, 'error', "Database error occurredd: " + err, 500);
             }
@@ -235,7 +231,10 @@ module.exports = {
         let decoded_token = jwt.decode(token)
 
         let api_response = await this.get_user(decoded_token.data.nik);
-        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'user not found', 404);
+
+        const api_response_check_email = await this.check_user_email_address(user.email_address);
+        if (api_response_check_email.status_code === 200) return helper.http_response(null, 'error', 'email address already taken by another user', 400);
 
         sql = 'UPDATE user SET email_address = ? WHERE nik = ?';
         value = [
@@ -258,7 +257,7 @@ module.exports = {
             }, process.env['JWT_SECRET_KEY'], { algorithm: 'HS256' });
             helper.add_token(token)
 
-            return helper.http_response(null, 'success', "Successfully Edit User Data", 200, token);
+            return helper.http_response(null, 'success', "successfully edit user data", 200, token);
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
         }
@@ -271,7 +270,7 @@ module.exports = {
             let result = await jwt.verify(token, process.env['JWT_SECRET_KEY']);
 
             let api_response = await this.get_user(result.data.nik);
-            if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+            if (api_response.status_code === 404) return helper.http_response(null, 'error', 'user not found', 404);
 
             try {
                 let result = await pool.query('SELECT password FROM user WHERE nik = ?', [result.data.nik]);
@@ -291,7 +290,7 @@ module.exports = {
                 ];
                 await pool.query(sql, value);
 
-                return helper.http_response(null, 'success', "Password updated successfully");
+                return helper.http_response(null, 'success', "password updated successfully");
             } catch (err) {
                 return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
             }
@@ -307,7 +306,7 @@ module.exports = {
         if (!user.nik) return helper.http_response(null, 'error', 'nik is not present in body', 400);
 
         let api_response = await this.get_user(user.nik);
-        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'User not found', 404);
+        if (api_response.status_code === 404) return helper.http_response(null, 'error', 'user not found', 404);
 
         let sql = 'SELECT email_address FROM user WHERE nik = ?'
         let value = [user.nik]
@@ -322,7 +321,7 @@ module.exports = {
 
             helper.send_mail_req_change_password(data[0].email_address, token);
 
-            return helper.http_response(null, 'success', "Email sent successfully, passsword reset link sent to your email account");
+            return helper.http_response(null, 'success', "email sent successfully, passsword reset link sent to your email account");
 
         } catch (err) {
             return helper.http_response(null, 'error', "Database error occurredd: " + err, 500)
