@@ -142,6 +142,7 @@ module.exports = {
         if (!user.password) return helper.http_response(null, 'error', 'password is not present in body', 400);
 
         let api_response = await this.get_user(user.nik);
+        console.log(api_response);
         if (api_response.status_code != 200) return helper.http_response(null, 'error', 'user not found', 404);
 
         let sql = 'SELECT * FROM user WHERE nik = ?'
