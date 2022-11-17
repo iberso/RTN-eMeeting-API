@@ -66,7 +66,7 @@ app.get('/', async(req, res) => {
     res.status(200).send({ "status": "success", "message": "Welcome to rutan e meeting API" });
 })
 
-Notification.start_cron_scheduler();
+// Notification.start_cron_scheduler();
 
 //User Services
 app.get('/api/user', middleware.check_authorization, async(req, res) => {
@@ -284,8 +284,6 @@ io.on("connection", function(socket) {
         console.log("Users disconnected : " + socket.id);
     });
 });
-
-
 
 server.listen(portServer, function() {
     console.log(`Rest API listening at ${portServer}`)
