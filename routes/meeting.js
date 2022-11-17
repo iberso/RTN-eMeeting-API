@@ -199,7 +199,7 @@ module.exports = {
                 await pool.query(query, values);
 
                 const api_response = await this.get_meeting_by_meeting_id(uuid_meeting);
-                await helper.send_mail_new_meeting(api_response.body.data);
+                await helper.send_mail_new_meeting(api_response.body.dat, 1);
                 //pengecekan type meeting
 
                 return helper.http_response(null, 'success', "meeting created successfully", 201);

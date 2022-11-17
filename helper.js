@@ -190,8 +190,21 @@ module.exports = {
         });
     },
 
-    send_mail_new_meeting(meeting) {
-        const template = fs.readFileSync('./template/mailer/new-meeting.html', 'utf8');
+    send_mail_meeting(meeting, type) {
+        //type 1 for new meeting
+        //type 2 for remind meeting
+        let template;
+        let subject = "";
+
+        if (type === 1) {
+            template = fs.readFileSync('./template/mailer/new-meeting.html', 'utf8');
+            subject = 'Meeting Invitation: ' + meeting.topic;
+        } else if (type === 2) {
+            template = fs.readFileSync('./template/mailer/reminder-meeting.html', 'utf8');
+            subject = 'Meeting Reminder: ' + meeting.topic;
+        } else {
+            return;
+        }
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -221,7 +234,7 @@ module.exports = {
                     name: 'Rutan E-Meeting Mailer',
                     address: process.env['EMAIL_ADDRESS']
                 },
-                subject: 'Meeting Invitation: ' + meeting.topic,
+                subject: subject,
                 html: mustache.render(template, { meeting_topic, meeting_date, current_user, meeting_location, meeting_time, meeting_participants, "participant": function() { return this.id_participant + " as " + this.participant_type } }),
                 attachments: [{
                     filename: 'logo_rutan.png',
