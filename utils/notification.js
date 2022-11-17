@@ -10,7 +10,8 @@ const admin = firebase.admin;
 module.exports = {
     start_cron_scheduler() {
         console.log("hai");
-        const scheduler_notification_before = Cron.schedule("* * * * *", async() => {
+        // const scheduler_notification_before = 
+        Cron.schedule("* * * * *", async() => {
             const response = await Meeting.get_all_meeting();
             const timee = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
             console.log(timee);
@@ -22,7 +23,7 @@ module.exports = {
             this.send_meeting_start_notification(response);
         });
 
-        scheduler_notification_before.start();
+        // scheduler_notification_before.start();
     },
     async get_meeting_setting() {
         try {
