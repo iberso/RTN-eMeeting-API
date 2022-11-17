@@ -13,7 +13,8 @@ module.exports = {
 
         Cron.schedule('* * * * *', () => {
             console.log("asdasdsad")
-            const timee = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
+            const datee = new Date();
+            const timee = Moment(datee).tz("Asia/Jakarta").format('HH:mm:ss');
             console.log("waktu : " + timee);
         });
 
