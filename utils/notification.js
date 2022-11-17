@@ -11,6 +11,8 @@ module.exports = {
     start_cron_scheduler() {
         const scheduler_notification_before = Cron.schedule("* * * * *", async() => {
             const response = await Meeting.get_all_meeting();
+            const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
+            console.log(time_now);
             this.send_meeting_notification(response);
         })
         const scheduler_notification_meeting_start = Cron.schedule("* * * * *", async() => {
@@ -51,6 +53,7 @@ module.exports = {
             const time_reminder = Moment(Moment(todayDate + " " + meeting.time_start).subtract(meeting_setting.reminder_before, 'minute')).format("HH:mm:ss");
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
             console.log(time_now);
+            console.log(time_reminder === time_now);
             if (time_reminder === time_now) {
                 console.log("Send notif reminder to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
