@@ -195,6 +195,7 @@ module.exports = {
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
+            secure: false,
             auth: {
                 user: process.env['EMAIL_ADDRESS'],
                 pass: process.env['EMAIL_APP_KEY']
@@ -203,9 +204,15 @@ module.exports = {
 
         const meeting_topic = meeting.topic;
         const meeting_date = moment(meeting.date).format('dddd, Do MMMM YYYY');
-        const meeting_location = meeting.type + " " + (meeting.type != 'Online') ? meeting.room.room_name : "" + " " + (meeting.type != 'Onsite') ? meeting.meeting_link : "";
+        let meeting_location = meeting.type;
+        if (meeting.room) {
+            meeting_location += " - " + meeting.room.room_name;
+        }
+        if (meeting.meeting_link) {
+            meeting_location += " - " + meeting.meeting_link;
+        }
         const meeting_time = meeting.time_start + " - " + meeting.time_end;
-
+        const meeting_participants = meeting.participants;
         meeting.participants.forEach(function(to, i, array) {
             const current_user = to.id_participant;
 
@@ -215,7 +222,7 @@ module.exports = {
                     address: process.env['EMAIL_ADDRESS']
                 },
                 subject: 'Meeting Invitation: ' + meeting.topic,
-                html: mustache.render(template, { meeting_topic, meeting_date, current_user, meeting_location, meeting_time }),
+                html: mustache.render(template, { meeting_topic, meeting_date, current_user, meeting_location, meeting_time, meeting_participants, "participant": function() { return this.id_participant + " as " + this.participant_type } }),
                 attachments: [{
                     filename: 'logo_rutan.png',
                     path: './assets/images/logo_rutan.png',
