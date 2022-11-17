@@ -45,11 +45,11 @@ module.exports = {
         });
     },
     async send_meeting_notification(today_meeting) {
-        const date = new Date();
-        const todayDate = Moment(date).tz("Asia/Jakarta").format('YYYY-MM-DD');
         const meeting_setting = JSON.parse(await this.get_meeting_setting());
 
         today_meeting.forEach(async meeting => {
+            const date = new Date();
+            const todayDate = Moment(date).tz("Asia/Jakarta").format('YYYY-MM-DD');
             const time_reminder = Moment(Moment(todayDate + " " + meeting.time_start).subtract(meeting_setting.reminder_before, 'minute')).format("HH:mm:ss");
             console.log(meeting_setting.reminder_before);
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
