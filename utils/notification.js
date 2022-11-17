@@ -55,7 +55,7 @@ module.exports = {
                 console.log("Send notif reminder to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
                 if (meeting.notification_type === 'Email') {
-                    await Helper.send_mail_new_meeting(api_response.body.data, 2);
+                    await Helper.send_mail_meeting(api_response.body.data, 2);
                 } else if (meeting.notification_type === 'Push Notification') {
                     const current_meeting = api_response.body.data;
                     await this.send_push_notification(current_meeting.id, '📢' + " MEETING REMINDER", current_meeting.topic + " starts at " + current_meeting.time_start);
