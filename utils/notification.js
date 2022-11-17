@@ -9,19 +9,25 @@ const admin = firebase.admin;
 
 module.exports = {
     start_cron_scheduler() {
+        console.log("MASUK");
+        Cron.schedule('* * * * *', () => {
+            const timee = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
+            console.log("waktu : " + timee);
+        });
+        console.log("KELUAR");
         const scheduler_notification_before = Cron.schedule("* * * * *", async() => {
             const response = await Meeting.get_all_meeting();
             const timee = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
             console.log(timee);
             console.log("lo");
             this.send_meeting_notification(response);
-        })
+        });
+
         const scheduler_notification_meeting_start = Cron.schedule("* * * * *", async() => {
             const response = await Meeting.get_all_meeting();
             this.send_meeting_start_notification(response);
         });
-
-        scheduler_notification_before.start();
+        // scheduler_notification_before.start();
     },
     async get_meeting_setting() {
         try {
