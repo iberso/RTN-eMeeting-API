@@ -54,6 +54,7 @@ module.exports = {
             const todayDate = Moment(date).tz("Asia/Jakarta").format('YYYY-MM-DD');
             const time_reminder = Moment(Moment(todayDate + " " + meeting.time_start).subtract(meeting_setting.reminder_before, 'minute')).format("HH:mm:ss");
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm:ss');
+            console.log(time_reminder + " " + time_now);
             if (time_reminder === time_now) {
                 console.log("Send notif reminder to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
