@@ -37,7 +37,7 @@ module.exports = {
         today_meeting.forEach(async meeting => {
             const date = new Date();
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm');
-            console.log("meeting start reminder: " + time_reminder + " " + time_now);
+            console.log("meeting start reminder: " + meeting.time_start + " " + time_now);
             if (meeting.time_start === time_now) {
                 console.log("Send meeting start to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
