@@ -11,7 +11,7 @@ module.exports = {
     start_cron_scheduler() {
         const scheduler_notification_before = Cron.schedule("* * * * *", async() => {
             const response = await Meeting.get_all_meeting();
-            console.log("SEND 1 MINUTE");
+            console.log("SEND EVERY 1 MINUTE");
             this.send_meeting_notification(response);
         });
 
@@ -21,7 +21,9 @@ module.exports = {
         });
 
         scheduler_notification_before.start();
+        // scheduler_notification_meeting_start.start();
     },
+
     async get_meeting_setting() {
         try {
             const meeting_setting = await Fs.readFileSync(Path.join(__dirname, '..', '/files/general_settings.json'), 'utf8');
@@ -30,6 +32,7 @@ module.exports = {
             console.log(err);
         }
     },
+
     async send_meeting_start_notification(today_meeting) {
         const date = new Date();
         today_meeting.forEach(async meeting => {
