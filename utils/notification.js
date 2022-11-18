@@ -37,6 +37,7 @@ module.exports = {
         today_meeting.forEach(async meeting => {
             const date = new Date();
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm');
+            console.log("meeting start reminder: " + time_reminder + " " + time_now);
             if (meeting.time_start === time_now) {
                 console.log("Send meeting start to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
@@ -54,7 +55,7 @@ module.exports = {
             const todayDate = Moment(date).tz("Asia/Jakarta").format('YYYY-MM-DD');
             const time_reminder = Moment(Moment(todayDate + " " + meeting.time_start).subtract(meeting_setting.reminder_before, 'minute')).format("HH:mm");
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm');
-            console.log(time_reminder + " " + time_now);
+            console.log("meeting reminder: " + time_reminder + " " + time_now);
             if (time_reminder === time_now) {
                 console.log("Send notif reminder to " + meeting.id);
                 const api_response = await Meeting.get_meeting_by_meeting_id(meeting.id);
