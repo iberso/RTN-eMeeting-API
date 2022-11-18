@@ -21,7 +21,7 @@ module.exports = {
         });
 
         scheduler_notification_before.start();
-        // scheduler_notification_meeting_start.start();
+        scheduler_notification_meeting_start.start();
     },
 
     async get_meeting_setting() {
