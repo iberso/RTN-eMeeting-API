@@ -37,7 +37,7 @@ module.exports = {
         today_meeting.forEach(async meeting => {
             const date = new Date();
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm');
-            const time_start = Moment(meeting.time_start).format('HH:mm');
+            const time_start = meeting.time_start.substr(0, 5);
 
             console.log("meeting start reminder: " + time_start + " " + time_now);
             if (time_start === time_now) {
