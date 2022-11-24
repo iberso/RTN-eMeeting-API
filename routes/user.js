@@ -277,11 +277,13 @@ module.exports = {
 
             try {
                 const result = await pool.query('SELECT password FROM user WHERE nik = ?', [decoded_token.data.nik]);
-                console.log(result);
+                console.log(result[0].password);
+                const bcrypt_compare_result = await bcrypt.compare(data.new_password, result[0].password);
 
-                if (await bcrypt.compare(data.new_password, result[0].password)) {
+                if (bcrypt_compare_result) {
                     return helper.http_response(null, 'error', 'New password cannot be the same as old password', 400);
                 }
+
             } catch (err) {
                 return helper.http_response(null, 'error', "Database error occurredd: " + err.message, 500)
             }
