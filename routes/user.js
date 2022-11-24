@@ -281,7 +281,7 @@ module.exports = {
                     return helper.http_response(null, 'error', 'New password cannot be the same as old password', 400);
                 }
             } catch (err) {
-                return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
+                return helper.http_response(null, 'error', "Database error occurredd: " + err.message, 500)
             }
 
             try {
