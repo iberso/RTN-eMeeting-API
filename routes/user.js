@@ -268,9 +268,11 @@ module.exports = {
         if (!data.new_password) return helper.http_response(null, 'error', 'new_password is not present', 400);
 
         try {
-            let result = await jwt.verify(token, process.env['JWT_SECRET_KEY']);
+            const result = jwt.verify(token, process.env['JWT_SECRET_KEY']);
 
-            let api_response = await this.get_user(result.data.nik);
+            console.log(result);
+
+            const api_response = await this.get_user(result.data.nik);
             if (api_response.status_code === 404) return helper.http_response(null, 'error', 'user not found', 404);
 
             try {

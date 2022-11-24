@@ -63,7 +63,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 app.get('/', async(req, res) => {
-    res.status(200).send({ "status": "success", "message": "Welcome to rutan e meeting API" });
+    res.status(200).send({ "status": "success", "message": "Welcome to E-MEETING REST API" });
 })
 
 // Notification.start_cron_scheduler();
@@ -72,47 +72,47 @@ app.get('/', async(req, res) => {
 app.get('/api/user', middleware.check_authorization, async(req, res) => {
     const response = await user.get_user(null, req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.get('/api/users', middleware.check_authorization, async(req, res) => {
     const response = await user.get_all_users();
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.post('/api/user/login', middleware.check_login, async(req, res) => {
     const response = await user.login_user(req.body);
     res.status(response.status_code).send(response.body)
-}); //DONE
+});
 
 app.put('/api/user/device_token', middleware.check_authorization, async(req, res) => {
     const response = await user.set_user_device_token(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.post('/api/user', async(req, res) => {
     const response = await user.add_user(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.post('/api/user/logout', middleware.check_authorization, async(req, res) => {
     const response = await user.logout_user(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.put('/api/user', middleware.check_authorization, async(req, res) => {
     const response = await user.edit_user(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.put('/api/user/reset-password/:token', async(req, res) => {
     const response = await user.change_password(req.params.token, req.body);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.post('/api/user/request-change-password', async(req, res) => {
     const response = await user.request_change_password(req.body);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.put('/api/user/:nik/profile', async(req, res) => {
     upload(req, res, async(err) => {
@@ -131,12 +131,12 @@ app.put('/api/user/:nik/profile', async(req, res) => {
         const response = await user.edit_user_profile(req.file.path, req.params.nik);
         res.status(response.status_code).send(response.body);
     });
-}); //DONE
+});
 
 app.put('/api/user/:nik/role', async(req, res) => {
     const response = await user.change_user_role(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.get("/api/user/:nik/profile", async(req, res) => {
     const response = await user.get_user_profile(req.params.nik);
@@ -145,34 +145,34 @@ app.get("/api/user/:nik/profile", async(req, res) => {
     } else {
         res.status(response.status_code).send(response.body);
     }
-}); //DONE
+});
 
 
 // Meeting Services
 app.get('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
     const response = await meeting.get_meeting_by_meeting_id(req.params.meeting_id);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.put('/api/meeting/:meeting_id', middleware.check_authorization, async(req, res) => {
     const response = await meeting.edit_meeting(req.body, req.params.meeting_id);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.put('/api/meeting/:meeting_id/approval', middleware.check_authorization, async(req, res) => {
     const response = await Document.approve_document(req.params.meeting_id, req.body.user_id, req.body.approval_status);
     res.status(response.status_code).send(response.body);
-}); //DONE check approval status
+});
 
 app.put('/api/meeting/:meeting_id/attendance', middleware.check_authorization, async(req, res) => {
     const response = await meeting.edit_participant_attendance(req.params.meeting_id, req.body.participants, req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.post('/api/meeting', middleware.check_authorization, async(req, res) => {
     const response = await meeting.add_meeting(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.get('/api/meeting/user/:nik', middleware.check_authorization, async(req, res) => {
     if (req.query.date) {
@@ -185,45 +185,45 @@ app.get('/api/meeting/user/:nik', middleware.check_authorization, async(req, res
         const response = await meeting.get_user_all_meeting(req.params.nik);
         res.status(response.status_code).send(response.body);
     }
-}); //DONE
+});
 
 app.post('/api/meeting/users', middleware.check_authorization, async(req, res) => {
     const response = await meeting.get_all_users(req.body);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 // Room Services
 app.post('/api/room', middleware.check_authorization, async(req, res) => {
     const response = await room.add_room(req.body);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.get('/api/room/:id_room', middleware.check_authorization, async(req, res) => {
     const response = await room.get_room_by_id(req.params.id_room);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.put('/api/room/:id_room', middleware.check_authorization, async(req, res) => {
     const response = await room.edit_room(req.body.room_name, req.params.id_room);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.post('/api/rooms', middleware.check_authorization, async(req, res) => {
     const response = await room.get_all_room_by_status(req.body);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.get('/api/rooms', middleware.check_authorization, async(req, res) => {
     const response = await room.get_all_room();
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 // Token Services
 
 app.get('/api/check-token', middleware.check_authorization, async(req, res) => {
     const response = await helper.verify_token(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 //ONLY USE IN TESTING ENV, REMOVE WHEN API USE IN PRODUCTION ENV
 app.get('/api/all-token', async(req, res) => {
@@ -233,23 +233,23 @@ app.get('/api/all-token', async(req, res) => {
 app.get('/api/token-extend', async(req, res) => {
     const response = await helper.extend_token(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.get('/api/reset-password-check/:token', async(req, res) => {
     const response = await helper.check_reset_password_token(req.params.token);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 // Settings Services
 app.get('/api/settings', middleware.check_authorization, async(req, res) => {
     const response = await Settings.get_meeting_general_settings();
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 app.put('/api/settings', middleware.check_authorization, async(req, res) => {
     const response = await Settings.set_meeting_general_settings(req);
     res.status(response.status_code).send(response.body);
-}); //DONE
+});
 
 
 io.on("connection", function(socket) {
