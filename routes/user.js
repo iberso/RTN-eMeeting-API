@@ -268,15 +268,15 @@ module.exports = {
         if (!data.new_password) return helper.http_response(null, 'error', 'new_password is not present', 400);
 
         try {
-            const result = jwt.verify(token, process.env['JWT_SECRET_KEY']);
+            const decoded_token = jwt.verify(token, process.env['JWT_SECRET_KEY']);
 
-            console.log(result);
+            console.log(decoded_token);
 
-            const api_response = await this.get_user(result.data.nik);
+            const api_response = await this.get_user(decoded_token.data.nik);
             if (api_response.status_code === 404) return helper.http_response(null, 'error', 'user not found', 404);
 
             try {
-                let result = await pool.query('SELECT password FROM user WHERE nik = ?', [result.data.nik]);
+                const result = await pool.query('SELECT password FROM user WHERE nik = ?', [decoded_token.data.nik]);
                 if (await bcrypt.compare(data.new_password, result[0].password)) {
                     return helper.http_response(null, 'error', 'New password cannot be the same as old password', 400);
                 }
