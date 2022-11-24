@@ -277,26 +277,20 @@ module.exports = {
 
             try {
                 const result = await pool.query('SELECT password FROM user WHERE nik = ?', [decoded_token.data.nik]);
-                console.log(result[0].password);
                 const bcrypt_compare_result = await bcrypt.compare(data.new_password, result[0].password);
-
-                if (bcrypt_compare_result) {
-                    return helper.http_response(null, 'error', 'New password cannot be the same as old password', 400);
-                }
-
+                if (bcrypt_compare_result) return helper.http_response(null, 'error', 'New password cannot be the same as old password', 400);
             } catch (err) {
-                return helper.http_response(null, 'error', "Database error occurredd: " + err.message, 500)
+                return helper.http_response(null, 'error', "Database error occurredd: " + err.message, 500);
             }
 
             try {
                 const hash_password = await bcrypt.hash(data.new_password.toString(), 10);
                 let sql = 'UPDATE user SET password = ? WHERE nik = ?';
-                let value = [
+                const value = [
                     hash_password,
-                    result.data.nik
+                    decoded_token.data.nik
                 ];
                 await pool.query(sql, value);
-
                 return helper.http_response(null, 'success', "password updated successfully");
             } catch (err) {
                 return helper.http_response(null, 'error', "Database error occurred: " + err.message, 500)
