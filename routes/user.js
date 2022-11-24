@@ -276,8 +276,9 @@ module.exports = {
             if (api_response.status_code === 404) return helper.http_response(null, 'error', 'user not found', 404);
 
             try {
-                const result = pool.query('SELECT password FROM user WHERE nik = ?', [decoded_token.data.nik]);
+                const result = await pool.query('SELECT password FROM user WHERE nik = ?', [decoded_token.data.nik]);
                 console.log(result);
+
                 if (await bcrypt.compare(data.new_password, result[0].password)) {
                     return helper.http_response(null, 'error', 'New password cannot be the same as old password', 400);
                 }
