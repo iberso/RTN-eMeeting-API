@@ -34,6 +34,7 @@ module.exports = {
     },
 
     async send_meeting_start_notification(today_meeting) {
+        console.log(today_meeting);
         today_meeting.forEach(async meeting => {
             const date = new Date();
             const time_now = Moment(date).tz("Asia/Jakarta").format('HH:mm');
