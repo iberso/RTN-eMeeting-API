@@ -162,7 +162,7 @@ module.exports = {
             }
         });
 
-        let link_reset_password = token;
+        const link_reset_password = process.env['WEB_BASE_URL'] + "/change-password?token=" + token;
 
         let mailOption = {
             from: {
