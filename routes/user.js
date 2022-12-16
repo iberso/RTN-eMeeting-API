@@ -142,7 +142,6 @@ module.exports = {
         if (!user.password) return helper.http_response(null, 'error', 'password is not present in body', 400);
 
         let api_response = await this.get_user(user.nik);
-        console.log(api_response);
         if (api_response.status_code != 200) return helper.http_response(null, 'error', 'user not found', 404);
 
         let sql = 'SELECT * FROM user WHERE nik = ?'
@@ -269,8 +268,6 @@ module.exports = {
 
         try {
             const decoded_token = jwt.verify(token, process.env['JWT_SECRET_KEY']);
-
-            console.log(decoded_token);
 
             const api_response = await this.get_user(decoded_token.data.nik);
             if (api_response.status_code === 404) return helper.http_response(null, 'error', 'user not found', 404);

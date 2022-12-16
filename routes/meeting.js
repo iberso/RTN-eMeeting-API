@@ -187,8 +187,7 @@ module.exports = {
         }
 
         let meeting_query = 'INSERT INTO meeting (' + meeting_query_key.join(',') + ') VALUES (' + helper.generate_values_placeholder(meeting_query_key) + ')';
-        console.log(meeting_query);
-        console.log(meeting_values);
+
         if (!meeting.participants) return helper.http_response(null, 'error', 'participants is not present in body', 400);
 
         try {
